@@ -222,9 +222,7 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 <label class="pv-clothes"><input type="radio" name="clothingStyle" value="Camisa de futebol"><img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&auto=format&fit=crop&q=80" alt="Camisa de futebol"><strong>Camisa de futebol</strong></label>
 <label class="pv-clothes"><input type="radio" name="clothingStyle" value="Moletom"><img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&auto=format&fit=crop&q=80" alt="Moletom"><strong>Moletom</strong></label>
 <label class="pv-clothes"><input type="radio" name="clothingStyle" value="Camisa social"><img src="https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=600&auto=format&fit=crop&q=80" alt="Camisa social"><strong>Camisa social</strong></label>
-<label class="pv-clothes"><input type="radio" name="clothingStyle" value="Jaqueta"><img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&auto=format&fit=crop&q=80" alt="Jaqueta"><strong>Jaqueta</strong></label></div></div>
-<div id="pvOutfitUpload" class="hidden"><label class="pv-upload-large" for="customClothing"><span>↑</span><strong>Enviar imagem da roupa</strong><small>JPG, PNG ou WebP</small><input id="customClothing" type="file" accept="image/png,image/jpeg,image/webp"></label><div id="clothingFileName" class="upload-name">Nenhuma imagem selecionada</div></div>
-<div class="pv-jersey-box" id="legacyJerseyFields">
+<label class="pv-clothes"><input type="radio" name="clothingStyle" value="Jaqueta"><img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&auto=format&fit=crop&q=80" alt="Jaqueta"><strong>Jaqueta</strong></label></div><div class="pv-jersey-box" id="legacyJerseyFields">
 <div class="pv-catalog-heading">Uniformes de times</div>
 <p class="studio-help">Escolha entre 26 clubes brasileiros e internacionais. A camisa e o short do time serão selecionados juntos.</p>
 <select id="jerseyTeam" class="hidden">
@@ -235,7 +233,9 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 <details class="pv-catalog-disclosure"><summary><span>Shorts correspondentes</span><small>26 opções · seleção automática pelo time</small></summary><p class="studio-help">Ao escolher uma camisa, o short do mesmo clube será marcado automaticamente. Você também pode trocar o short.</p><div class="pv-jersey-grid" id="teamShortGallery"></div></details>
 <div class="pv-catalog-heading">Personalizar nome e número</div><div class="pv-clothing-fields"><div class="field"><label for="jerseyName">Nome nas costas</label><input id="jerseyName" maxlength="16" placeholder="Ex.: WILL"></div><div class="field"><label for="jerseyNumber">Número</label><input id="jerseyNumber" type="number" min="0" max="99" placeholder="10"></div></div>
 <div class="field"><label for="jerseyFont">Estilo das letras</label><select id="jerseyFont"><option value="Esportiva clássica">Esportiva clássica</option><option value="Moderna">Moderna</option><option value="Retrô">Retrô</option><option value="Personalizada">Personalizada</option></select></div>
-<div class="pv-jersey-preview"><span class="pv-eyebrow">PRÉVIA DA PERSONALIZAÇÃO</span><strong id="jerseyPreviewName">SEU NOME</strong><b id="jerseyPreviewNumber">10</b><small id="jerseyPreviewTeam">Escolha um uniforme</small></div>
+<div class="pv-jersey-preview"><span class="pv-eyebrow">PRÉVIA DA PERSONALIZAÇÃO</span><strong id="jerseyPreviewName">SEU NOME</strong><b id="jerseyPreviewNumber">10</b><small id="jerseyPreviewTeam">Escolha um uniforme</small></div></div>
+<div id="pvOutfitUpload" class="hidden"><label class="pv-upload-large" for="customClothing"><span>↑</span><strong>Enviar imagem da roupa</strong><small>JPG, PNG ou WebP</small><input id="customClothing" type="file" accept="image/png,image/jpeg,image/webp"></label><div id="clothingFileName" class="upload-name">Nenhuma imagem selecionada</div></div>
+
 </div><div class="pv-wizard-panel" data-step="5">
     <span class="pv-eyebrow">ETAPA 06 · DETALHES</span><h2>Configure os detalhes finais</h2><p class="studio-help">Personalize os acessórios, os elementos que devem permanecer e as instruções específicas da transformação.</p>
     <section class="pv-config-section"><div class="pv-config-heading"><span>01</span><div><h3>Acessórios e acabamentos</h3><p>Selecione tudo o que deseja adicionar ao personagem.</p></div></div>
@@ -301,6 +301,23 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 .pv-format-options input{position:absolute;opacity:0}
 .pv-format-options strong{font-size:17px;color:#f4efff}.pv-format-options span{font-size:10px;color:#a7a5b8}
 @media(max-width:760px){.pv-review-list{grid-template-columns:1fr}.pv-format-options{grid-template-columns:1fr 1fr}.pv-config-section{padding:13px}.pv-catalog-disclosure summary{align-items:flex-start;flex-wrap:wrap}.pv-catalog-disclosure summary small{width:100%;margin:0}}
+
+/* Visual: mostrar uniformes apenas quando a pessoa escolher personalizar */
+#legacyJerseyFields{margin-top:16px}
+.pv-wizard-panel{min-height:0}
+.pv-wizard-panel[data-step="4"]>.pv-outfit-grid{margin-top:16px;margin-bottom:16px}
+.pv-wizard-panel[data-step="4"]>.pv-outfit-grid .pv-option{min-height:112px;align-content:start}
+.pv-wizard-panel[data-step="5"] .pv-config-section{margin:14px 0;padding:18px}
+.pv-wizard-panel[data-step="5"] .pv-detail-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0 0}
+.pv-wizard-panel[data-step="5"] .pv-detail{min-height:62px;align-items:center;padding:12px;background:#171a2b;border:1px solid #373a54}
+.pv-wizard-panel[data-step="5"] .pv-detail:has(input:checked){background:linear-gradient(135deg,#20334a,#211b35);border-color:#67e8f9;box-shadow:inset 0 0 0 1px #67e8f944}
+.pv-wizard-panel[data-step="5"] .pv-detail span{display:grid;place-items:center;width:25px;height:25px;border-radius:8px;background:#0ea5e922;font-size:16px}
+.pv-wizard-panel[data-step="5"] .pv-detail:has(input:checked) span{background:#0ea5e944}
+.pv-wizard-panel[data-step="6"] .pv-review-group{padding:16px;background:linear-gradient(145deg,#171a2b,#10121f);border-color:#393c55}
+.pv-wizard-panel[data-step="6"] .pv-review-row{align-items:flex-start;line-height:1.45}
+.pv-wizard-panel[data-step="6"] .pv-review-row strong{color:#f1efff}
+.pv-wizard-panel[data-step="6"] .pv-review-edit{font-size:11px;padding:7px 11px}
+@media(max-width:760px){.pv-wizard-panel[data-step="5"] .pv-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pv-wizard-panel[data-step="4"]>.pv-outfit-grid{grid-template-columns:1fr}}
 </style>
 <section id="tab-history" class="hidden history-page">
 <div class="history-hero"><div class="history-hero-copy"><span class="history-kicker"><i></i> SUA BIBLIOTECA CRIATIVA</span><h1>Meus <em>projetos</em></h1><p>Todos os seus projetos em um só lugar. Acompanhe o status e continue organizando suas próximas criações.</p></div><button class="btn primary history-new-btn" data-goto="create">＋ Novo projeto <span>→</span></button><div class="history-hero-mark" aria-hidden="true">P<span>.</span></div></div>
