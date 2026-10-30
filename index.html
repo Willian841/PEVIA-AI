@@ -137,6 +137,21 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 #projectForm .pv-wizard-panel[data-step="5"] .pv-detail{display:flex!important;visibility:visible!important;opacity:1!important}
 #projectForm .pv-wizard-panel[data-step="6"] .pv-review-list{display:grid!important}
 @media(max-width:600px){#projectForm .pv-wizard-panel[data-step="5"] .pv-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+/* Visual: catálogo compacto, roupas primeiro e uniformes recolhidos */
+.pv-wizard-panel[data-step="4"]{min-height:0!important;padding-bottom:4px}
+.pv-wizard-panel[data-step="4"]>h2{margin:6px 0 5px!important}
+.pv-wizard-panel[data-step="4"]>.studio-help{margin:5px 0 10px!important}
+.pv-wizard-panel[data-step="4"]>.pv-outfit-grid{margin:10px 0 12px!important;gap:8px!important}
+.pv-wizard-panel[data-step="4"] .pv-full-outfit-catalog{margin-top:10px}
+.pv-wizard-panel[data-step="4"] .pv-clothes-picker{padding:12px;margin:0 0 12px;border:1px solid #303249;border-radius:13px;background:#111321}
+.pv-wizard-panel[data-step="4"] .pv-clothes-picker .pv-catalog-heading{margin:0 0 5px}
+.pv-wizard-panel[data-step="4"] .pv-clothes-picker .studio-help{margin:0 0 9px}
+.pv-wizard-panel[data-step="4"] .pv-clothes-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0!important}
+.pv-wizard-panel[data-step="4"] .pv-clothes{min-width:0;padding:8px 6px;gap:6px}
+.pv-wizard-panel[data-step="4"] .pv-clothes img{width:100%;height:92px!important;object-fit:cover;border-radius:7px}
+.pv-wizard-panel[data-step="4"] .pv-catalog-disclosure{margin:10px 0}
+@media(max-width:600px){.pv-wizard-panel[data-step="4"] .pv-clothes-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.pv-wizard-panel[data-step="4"] .pv-clothes img{height:105px!important}}
 </style>
 </head>
 <body>
@@ -219,15 +234,15 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
    <div class="pv-wizard-panel" data-step="4">
 <span class="pv-eyebrow">ETAPA 05 · VISUAL</span><h2>Personalize as roupas</h2><p class="studio-help">Escolha uma peça simples ou envie uma referência. Você pode manter a roupa original do vídeo.</p>
 <div class="pv-option-grid pv-outfit-grid"><label class="pv-option selected"><input type="radio" name="outfitMode" value="Manter roupa original" checked><span class="pv-option-icon">↔</span><strong>Manter roupa original</strong><small>Preservar o visual do vídeo</small></label><label class="pv-option"><input type="radio" name="outfitMode" value="Escolher roupa do catálogo"><span class="pv-option-icon">✦</span><strong>Personalizar peças</strong><small>Escolha uma camisa ou outro estilo</small></label><label class="pv-option"><input type="radio" name="outfitMode" value="Enviar minha roupa"><span class="pv-option-icon">↑</span><strong>Enviar referência</strong><small>Use uma imagem da roupa desejada</small></label></div>
-<div id="pvOutfitCatalog" class="hidden pv-full-outfit-catalog"><div class="pv-jersey-box" id="legacyJerseyFields">
+<div id="pvOutfitCatalog" class="hidden pv-full-outfit-catalog"><div class="pv-clothes-picker"><div class="pv-catalog-heading">Escolha uma peça</div><p class="studio-help">As opções aparecem primeiro; os uniformes ficam logo abaixo.</p></div><div class="pv-jersey-box" id="legacyJerseyFields">
 <div class="pv-catalog-heading">Uniformes de times</div>
 <p class="studio-help">Escolha entre 26 clubes brasileiros e internacionais. A camisa e o short do time serão selecionados juntos.</p>
 <select id="jerseyTeam" class="hidden">
 <option value="">Escolha um time</option>
 <optgroup label="Brasil"><option>Flamengo</option><option>Corinthians</option><option>Palmeiras</option><option>São Paulo</option><option>Santos</option><option>Bahia</option><option>Vitória</option><option>Vasco</option><option>Fluminense</option><option>Botafogo</option><option>Grêmio</option><option>Internacional</option><option>Atlético-MG</option><option>Cruzeiro</option><option>Sport</option><option>Fortaleza</option></optgroup>
 <optgroup label="Internacionais"><option>Real Madrid</option><option>Barcelona</option><option>Manchester City</option><option>Manchester United</option><option>Liverpool</option><option>Arsenal</option><option>PSG</option><option>Bayern de Munique</option><option>Inter de Milão</option><option>Juventus</option></optgroup></select>
-<details class="pv-catalog-disclosure" open><summary><span>Camisas de 26 times</span><small>Escolher clube e uniforme</small></summary><div class="pv-catalog-heading">Camisas</div><div class="pv-jersey-grid" id="jerseyGallery"></div></details>
-<details class="pv-catalog-disclosure" open><summary><span>Shorts correspondentes</span><small>26 opções · seleção automática pelo time</small></summary><p class="studio-help">Ao escolher uma camisa, o short do mesmo clube será marcado automaticamente. Você também pode trocar o short.</p><div class="pv-jersey-grid" id="teamShortGallery"></div></details>
+<details class="pv-catalog-disclosure"><summary><span>Camisas de 26 times</span><small>Escolher clube e uniforme</small></summary><div class="pv-catalog-heading">Camisas</div><div class="pv-jersey-grid" id="jerseyGallery"></div></details>
+<details class="pv-catalog-disclosure"><summary><span>Shorts correspondentes</span><small>26 opções · seleção automática pelo time</small></summary><p class="studio-help">Ao escolher uma camisa, o short do mesmo clube será marcado automaticamente. Você também pode trocar o short.</p><div class="pv-jersey-grid" id="teamShortGallery"></div></details>
 <div class="pv-catalog-heading">Personalizar nome e número</div><div class="pv-clothing-fields"><div class="field"><label for="jerseyName">Nome nas costas</label><input id="jerseyName" maxlength="16" placeholder="Ex.: WILL"></div><div class="field"><label for="jerseyNumber">Número</label><input id="jerseyNumber" type="number" min="0" max="99" placeholder="10"></div></div>
 <div class="field"><label for="jerseyFont">Estilo das letras</label><select id="jerseyFont"><option value="Esportiva clássica">Esportiva clássica</option><option value="Moderna">Moderna</option><option value="Retrô">Retrô</option><option value="Personalizada">Personalizada</option></select></div>
 <div class="pv-jersey-preview"><span class="pv-eyebrow">PRÉVIA DA PERSONALIZAÇÃO</span><strong id="jerseyPreviewName">SEU NOME</strong><b id="jerseyPreviewNumber">10</b><small id="jerseyPreviewTeam">Escolha um uniforme</small></div></div>
