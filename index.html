@@ -150,6 +150,11 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 .pv-premium-cta{width:100%;margin-top:24px;padding:15px 20px;font-size:15px}.pv-premium-footnote{text-align:center;color:#8f8da0;font-size:10px;margin:12px 0 0}
 @media(max-width:600px){.pv-premium-section{padding:62px 0}.pv-premium-card{padding:21px 16px}.pv-premium-card h3{font-size:23px}.pv-premium-price strong{font-size:36px}.pv-premium-list{grid-template-columns:1fr;gap:8px}.pv-premium-list li{padding:11px}}
 
+
+/* Seletor de planos antes do estúdio */
+.pv-access-plans{max-width:1040px;margin:26px auto 50px}.pv-access-heading{text-align:center;margin:0 auto 25px}.pv-access-heading h2{font-size:clamp(27px,4vw,38px);margin:8px 0}.pv-access-heading p{color:#aaa8bb;margin:0}.pv-access-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:16px;align-items:stretch}.pv-access-card{padding:25px;border:1px solid #34364a;border-radius:17px;background:linear-gradient(145deg,#171827,#10111b)}.pv-access-premium{border-color:#67e8f988;background:radial-gradient(ellipse at 90% 0,#0e749033,transparent 45%),linear-gradient(145deg,#1b1b30,#111321);box-shadow:0 15px 45px #0005}.pv-access-label{font-size:10px;letter-spacing:1.5px;font-weight:900;color:#bae6fd}.pv-access-card h3{font-size:22px;margin:13px 0 5px}.pv-access-price{font-size:32px;font-weight:900;letter-spacing:-1px;color:#67e8f9}.pv-access-price small{font-size:11px;font-weight:500;letter-spacing:0;color:#aaa8bb}.pv-access-old{font-size:13px;color:#9290a1;text-decoration:line-through;margin-top:10px}.pv-access-description{font-size:12px;color:#aaa8bb;min-height:38px}.pv-access-card ul{list-style:none;padding:0;margin:18px 0;display:grid;gap:10px}.pv-access-card li{font-size:12px;color:#e4e2ef;line-height:1.4}.pv-access-card li strong{color:#67e8f9}.pv-access-card li.pv-access-locked{color:#a19eb0}.pv-access-cta{width:100%;margin-top:8px}.pv-access-payment-note{text-align:center;color:#9b99aa;font-size:11px;margin:17px auto 0;max-width:680px}.pv-wizard-layout{display:none!important}
+@media(max-width:700px){.pv-access-plans{margin:18px 0 35px}.pv-access-grid{grid-template-columns:1fr}.pv-access-card{padding:21px}.pv-access-description{min-height:0}}
+
 </style>
 </head>
 <body>
@@ -210,6 +215,27 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 </section>
 <section id="tab-create" class="hidden pv-wizard-page">
 <div class="studio-intro"><div><span class="studio-kicker">PEVIA CREATOR STUDIO</span><h1>Crie seu vídeo com IA</h1><p>Configure sua transformação em etapas. Escolha quem será substituído, envie o vídeo e personalize o personagem.</p></div><span class="tag">ESTÚDIO DE CRIAÇÃO</span></div>
+
+<div class="pv-access-plans" id="pvAccessPlans">
+ <div class="pv-access-heading"><span class="pv-eyebrow">ESCOLHA SEU ACESSO</span><h2>Qual plano combina com sua criação?</h2><p>Compare os limites e escolha seu acesso antes de começar um projeto.</p></div>
+ <div class="pv-access-grid">
+  <article class="pv-access-card">
+   <span class="pv-access-label">PLANO BÁSICO</span><h3>Comece a criar</h3>
+   <div class="pv-access-price">R$ 9,00 <small>/ 20 dias</small></div>
+   <p class="pv-access-description">Para quem quer começar com uma transformação por vídeo.</p>
+   <ul><li>✓ 8 créditos incluídos</li><li>✓ Até <strong>1 pessoa por vídeo</strong></li><li>✓ Acesso às ferramentas básicas de criação</li><li class="pv-access-locked">🔒 Substituição de 2 a 5 pessoas bloqueada</li></ul>
+   <button type="button" class="btn pv-access-cta" data-plan-interest="basic">Quero meu acesso básico</button>
+  </article>
+  <article class="pv-access-card pv-access-premium">
+   <span class="pv-access-label">✦ PLANO PREMIUM · ACESSO COMPLETO</span><h3>Tenha todos os recursos</h3>
+   <div class="pv-access-old">R$ 99,99</div><div class="pv-access-price">R$ 49,99 <small>/ 30 dias</small></div>
+   <p class="pv-access-description">Mais possibilidades para criar vídeos e desenvolver seus conteúdos.</p>
+   <ul><li>✓ 55 créditos incluídos</li><li>✓ Direito a até <strong>5 pessoas por vídeo</strong></li><li>✓ Curso completo passo a passo</li><li>✓ Criador de avatar com mais de 25 looks</li><li>✓ Personagem em pessoa real e prompts prontos</li><li>✓ Pack de vídeos virais</li><li>✓ Bônus de recuperação de conta do Instagram</li><li>✓ Bônus mil seguidores (liberado 7 dias após a compra)</li><li>✓ Grupo de networking no WhatsApp</li><li>✓ Programa de afiliados com 50% de comissão</li></ul>
+   <button type="button" class="btn primary pv-access-cta" data-plan-interest="premium">Quero meu acesso agora →</button>
+  </article>
+ </div>
+ <p class="pv-access-payment-note">A escolha do plano ainda não inicia uma cobrança. O checkout e a confirmação do pagamento serão conectados antes de liberar o estúdio.</p>
+</div>
 <div class="pv-wizard-layout">
  <div class="pv-wizard-main">
   <div class="pv-stepper" id="pvStepper" aria-label="Etapas da criação"><button type="button" class="pv-step active" data-pv-step="0" aria-label="Ir para Tipo"><i>1</i><span>Tipo</span></button><button type="button" class="pv-step" data-pv-step="1" aria-label="Ir para Vídeo"><i>2</i><span>Vídeo</span></button><button type="button" class="pv-step" data-pv-step="2" aria-label="Ir para Substituir"><i>3</i><span>Substituir</span></button><button type="button" class="pv-step" data-pv-step="3" aria-label="Ir para Personagem"><i>4</i><span>Personagem</span></button><button type="button" class="pv-step" data-pv-step="4" aria-label="Ir para Visual"><i>5</i><span>Visual</span></button><button type="button" class="pv-step" data-pv-step="5" aria-label="Ir para Detalhes"><i>6</i><span>Detalhes</span></button><button type="button" class="pv-step" data-pv-step="6" aria-label="Ir para Revisar"><i>7</i><span>Revisar</span></button></div>
@@ -435,6 +461,7 @@ $('#aiConnectionTest')?.addEventListener('click',async()=>{
 async function checkAdminAccess(user){try{const {data,error}=await supabaseClient.from('profiles').select('role').eq('id',user.id).maybeSingle();if(error)throw error;isPeviaAdmin=data?.role==='admin';$('#adminNav').classList.toggle('hidden',!isPeviaAdmin);return isPeviaAdmin}catch(err){console.error('Não foi possível validar administrador:',err);isPeviaAdmin=false;$('#adminNav').classList.add('hidden');return false}}
 async function showDashboard(user){currentUser=user;landing.style.display='none';dashboard.classList.add('active');$('#userLabel').textContent=user.email||'Minha conta';await checkAdminAccess(user);await renderProjects();showTab('overview')}
 function showTab(tab){if(tab==='admin'&&!isPeviaAdmin)tab='overview';['overview','create','history','admin'].forEach(t=>$('#tab-'+t).classList.toggle('hidden',t!==tab));document.querySelectorAll('.side-link[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));if(tab==='admin')renderAdminMedia()}
+document.querySelectorAll('[data-plan-interest]').forEach(b=>b.addEventListener('click',()=>{const plan=b.dataset.planInterest==='premium'?'Premium (R$ 49,99)':'Básico (R$ 9,00)';alert('Você selecionou o plano '+plan+'. A cobrança do Mercado Pago ainda está sendo integrada. Nenhum pagamento foi iniciado e o estúdio continuará bloqueado até a confirmação real do pagamento.');}));
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.goto)));
 $('#logout').onclick=async()=>{if(supabaseClient)await supabaseClient.auth.signOut();currentUser=null;projects=[];isPeviaAdmin=false;$('#adminNav').classList.add('hidden');dashboard.classList.remove('active');landing.style.display='block'};
 async function renderAdminMedia(){if(!isPeviaAdmin||!supabaseClient)return;const box=$('#homeMediaList');box.textContent='Carregando vídeos...';const {data,error}=await supabaseClient.from('site_media').select('id,placement,title,storage_path,is_active,created_at').order('created_at',{ascending:false});if(error){box.textContent='Erro ao carregar: '+error.message;return}if(!data?.length){box.textContent='Nenhum vídeo publicado.';return}box.innerHTML=data.map(item=>'<div class="project"><div><strong>'+escapeHtml(item.title||'Vídeo sem título')+'</strong><div class="muted">'+(item.placement==='hero'?'Banner principal':'Galeria')+' · '+(item.is_active?'Publicado':'Removido')+'</div></div>'+(item.is_active?'<button class="btn" data-deactivate-media="'+item.id+'">Remover</button>':'<span class="status">Inativo</span>')+'</div>').join('');box.querySelectorAll('[data-deactivate-media]').forEach(btn=>btn.addEventListener('click',async()=>{if(!confirm('Remover este vídeo da página inicial?'))return;const {error}=await supabaseClient.from('site_media').update({is_active:false,updated_at:new Date().toISOString()}).eq('id',btn.dataset.deactivateMedia);if(error){alert('Não foi possível remover: '+error.message);return}await renderAdminMedia();await renderHomeMedia()}))}
