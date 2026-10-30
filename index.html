@@ -563,7 +563,7 @@ $('#projectForm').addEventListener('submit',async e=>{
    referenceImageUrl=referenceImg?.getAttribute('src')||'';
    if(!referenceImageUrl)throw new Error('Escolha um personagem que tenha foto na galeria ou envie sua própria foto de referência.');
   }
-  if(!confirm('Este teste enviará seu vídeo e a foto de referência à WaveSpeedAI. Estimativa para '+billableDuration+'s faturáveis em 480p: US$ '+estimatedCost.toFixed(2)+'. O provedor faz a cobrança real conforme a duração. Deseja continuar?'))throw new Error('Geração cancelada. Nenhum arquivo foi enviado à IA.');
+  if(!confirm('Este teste enviará seu vídeo e a foto de referência à WaveSpeedAI. Estimativa para '+billableDuration+'s faturáveis em 720p: US$ '+estimatedCost.toFixed(2)+'. O provedor faz a cobrança real conforme a duração. Deseja continuar?'))throw new Error('Geração cancelada. Nenhum arquivo foi enviado à IA.');
   const avatarParts=['avatarHair','avatarFace','avatarBody','avatarBeard'].map(n=>pvSelected(n)).filter(Boolean).join(', ');
   const character=characterList.join(', ')||(avatarParts?'Avatar personalizado: '+avatarParts+'; '+($('#avatarDescription')?.value?.trim()||'Sem detalhes adicionais'):($('#avatarDescription')?.value?.trim()?'Avatar personalizado: '+$('#avatarDescription').value.trim():'Personagem não selecionado'));
   const details=[...document.querySelectorAll('input[name="detail"]:checked')].map(x=>x.value);
