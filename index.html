@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080910"><meta name="description" content="PEVIA — estúdio de criação de vídeos com IA.">
 <title>PEVIA — AI Video Studio</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="https://sdk.mercadopago.com/js/v2"></script>
 <style>
 :root{color-scheme:dark;--bg:#080910;--panel:#111321;--panel2:#171a2b;--line:#292c40;--muted:#a4a7b8;--white:#f7f7fb;--purple:#67e8f9;--pink:#ec4899}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 75% -10%,#34215d 0,transparent 38%),var(--bg);color:var(--white);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}.wrap{max-width:1160px;margin:auto;padding:0 24px}
@@ -187,6 +187,18 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 
 #tab-create:not(.hidden) { display: block !important; }
 #tab-create:not(.hidden) #pvAccessPlans { display: block !important; visibility: visible !important; opacity: 1 !important; }
+
+#peviaCheckoutModal{display:none;position:fixed;inset:0;z-index:1000000;background:#05060bdd;padding:16px;overflow:auto;align-items:center;justify-content:center}
+#peviaCheckoutModal.open{display:flex}#peviaCheckoutModal .pc-shell{width:min(650px,100%);background:#111321;border:1px solid #343850;border-radius:18px;padding:22px}
+#peviaCheckoutModal .pc-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+#peviaCheckoutModal button{cursor:pointer}#peviaCheckoutModal .pc-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+#peviaCheckoutModal .pc-method{padding:13px;border:1px solid #3b4058;border-radius:10px;background:#191c2c;color:white;font-weight:800}
+#peviaCheckoutModal .pc-method.active{border-color:#67e8f9;background:#12303a}
+#peviaCheckoutModal label{display:block;margin:12px 0;color:#d9dbea}#peviaCheckoutModal input{display:block;width:100%;margin-top:5px;padding:12px;border:1px solid #3a3e54;border-radius:9px;background:#090b14;color:white}
+#peviaCheckoutModal .pc-result{display:none;margin-top:16px;padding:15px;border:1px solid #28684f;border-radius:12px}
+#peviaCheckoutModal .pc-result img{display:block;width:210px;height:210px;object-fit:contain;background:white;margin:12px auto}
+#peviaCheckoutModal textarea{width:100%;background:#090b14;color:#b7f7dc;padding:10px}
+#peviaCheckoutModal .pc-error{color:#fca5a5;margin-top:10px}
 </style>
 </head>
 <body>
@@ -836,6 +848,21 @@ $('#projectForm').addEventListener('submit',async e=>{
   await renderProjects();
  }
 });
+
+const PC_PUBLIC_KEY='APP_USR-2da80765-d6e2-4923-98ef-3d000ea1f965';
+let pcPlan=null,pcAmount=0,pcBrick=null,pcPayment=null,pcPoll=null;
+function pcShow(plan){pcPlan=plan;pcAmount=plan==='premium'?49.99:9;document.getElementById('pcPlanInfo').textContent=(plan==='premium'?'Premium — R$ 49,99':'Básico — R$ 9,00');document.getElementById('peviaCheckoutModal').classList.add('open');pcMethod('pix')}
+function pcMethod(m){document.querySelectorAll('[data-pc-method]').forEach(x=>x.classList.toggle('active',x.dataset.pcMethod===m));document.getElementById('pcPixPanel').style.display=m==='pix'?'block':'none';document.getElementById('pcCardPanel').style.display=m==='card'?'block':'none';if(m==='card')pcMountCard()}
+async function pcSend(body){const {data,error}=await supabaseClient.functions.invoke('pevia-create-payment',{body:{plan:pcPlan,...body}});if(error)throw new Error(data?.error||error.message);return data}
+async function pcMountCard(){if(pcBrick||!window.MercadoPago)return;try{const mp=new MercadoPago(PC_PUBLIC_KEY,{locale:'pt-BR'});pcBrick=await mp.bricks().create('cardPayment','cardPaymentBrick_container',{initialization:{amount:pcAmount},callbacks:{onSubmit:async formData=>{try{document.getElementById('pcError').textContent='Processando cartão...';const r=await pcSend({method:'card',form_data:formData});pcShowResult(r,false);return Promise.resolve()}catch(e){document.getElementById('pcError').textContent=e.message;return Promise.reject(e)}},onError:e=>console.error(e)}})}catch(e){document.getElementById('pcError').textContent='Não foi possível carregar o formulário de cartão.';console.error(e)}}
+function pcShowResult(r,pix){pcPayment=r.payment_id;document.getElementById('pcResult').style.display='block';document.getElementById('pcResultTitle').textContent=pix?'PIX gerado!':(r.status==='approved'?'Pagamento aprovado!':'Pagamento enviado');if(pix&&r.qr_code_base64){const im=document.getElementById('pcQrImage');im.src='data:image/png;base64,'+r.qr_code_base64;im.style.display='block'}if(pix&&r.qr_code){const tx=document.getElementById('pcPixCode');tx.value=r.qr_code;tx.style.display='block';document.getElementById('pcCopyPix').style.display='block'}pcWatch()}
+function pcWatch(){if(pcPoll)clearInterval(pcPoll);pcPoll=setInterval(async()=>{if(!pcPayment)return;const {data}=await supabaseClient.from('payments').select('status').eq('id',pcPayment).maybeSingle();if(!data)return;document.getElementById('pcPaymentStatus').textContent='Status: '+data.status;if(data.status==='approved'){clearInterval(pcPoll);document.getElementById('pcResultTitle').textContent='Pagamento confirmado!';await refreshPlanStatus()}},5000)}
+document.querySelectorAll('[data-plan-interest]').forEach(b=>b.addEventListener('click',()=>{if(!currentUser||!supabaseClient){startCreationAfterAuth=true;openModal('login');return}pcShow(b.dataset.planInterest)}));
+document.querySelectorAll('[data-pc-method]').forEach(b=>b.addEventListener('click',()=>pcMethod(b.dataset.pcMethod)));
+document.getElementById('pcClose').onclick=()=>{document.getElementById('peviaCheckoutModal').classList.remove('open');if(pcPoll)clearInterval(pcPoll)};
+document.getElementById('pcPixSubmit').onclick=async()=>{const n=document.getElementById('pcPixName').value.trim(),cpf=document.getElementById('pcPixCpf').value.replace(/\D/g,'');if(n.split(/\s+/).length<2||cpf.length!==11){document.getElementById('pcError').textContent='Informe nome completo e CPF válido.';return}const b=document.getElementById('pcPixSubmit');b.disabled=true;try{const r=await pcSend({method:'pix',payer:{first_name:n.split(/\s+/)[0],last_name:n.split(/\s+/).slice(1).join(' '),identification:{type:'CPF',number:cpf}}});pcShowResult(r,true)}catch(e){document.getElementById('pcError').textContent=e.message}finally{b.disabled=false}};
+document.getElementById('pcCopyPix').onclick=async()=>{await navigator.clipboard.writeText(document.getElementById('pcPixCode').value);document.getElementById('pcCopyPix').textContent='Copiado!'};
+
 if(supabaseClient)supabaseClient.auth.getSession().then(({data})=>{if(data.session)showDashboard(data.session.user)}).catch(err=>console.error('Falha ao recuperar sessão:',err));
 if(supabaseClient)supabaseClient.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'&&session&&!currentUser)showDashboard(session.user)});
 // Contagem regressiva da promoção do plano Básico (encerramento em 19/11/2026 às 23:59 no horário de Brasília).
@@ -854,4 +881,4 @@ if(supabaseClient)supabaseClient.auth.onAuthStateChange((event,session)=>{if(eve
  render();
  setInterval(render,1000);
 })();
-</script></body></html>
+</script><div id="peviaCheckoutModal"><div class="pc-shell"><div class="pc-row"><h2>Finalize sua compra</h2><button type="button" id="pcClose" class="btn">Fechar ✕</button></div><p id="pcPlanInfo" class="muted"></p><div class="pc-methods"><button type="button" class="pc-method active" data-pc-method="pix">PIX</button><button type="button" class="pc-method" data-pc-method="card">Cartão</button></div><section id="pcPixPanel"><label>Nome completo<input id="pcPixName" autocomplete="name"></label><label>CPF<input id="pcPixCpf" inputmode="numeric" maxlength="14"></label><button type="button" class="btn primary" id="pcPixSubmit">Gerar PIX</button></section><section id="pcCardPanel" style="display:none"><div id="cardPaymentBrick_container"></div></section><p class="pc-error" id="pcError"></p><div class="pc-result" id="pcResult"><strong id="pcResultTitle">PIX gerado</strong><img id="pcQrImage" alt="QR Code PIX" style="display:none"><textarea id="pcPixCode" rows="4" readonly style="display:none"></textarea><button type="button" class="btn" id="pcCopyPix" style="display:none">Copiar código PIX</button><p id="pcPaymentStatus">Aguardando confirmação...</p></div></div></div></body></html>
