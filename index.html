@@ -579,6 +579,12 @@ $('#projectForm').addEventListener('submit',async e=>{
    if(!clothingImageUrl)throw new Error('Selecione uma camisa/peça no catálogo para enviar a imagem da roupa ao modelo.');
   }
   if(outfit==='Enviar minha roupa'&&!customClothingFile)throw new Error('Envie a imagem da roupa que deseja usar.');
+  // Verifica o saldo real antes de criar projeto ou enviar arquivos. Esta consulta não inicia geração nem consome créditos.
+  const {data:balanceData,error:balanceError}=await supabaseClient.functions.invoke('pevia-wavespeed-balance',{body:{}});
+  if(balanceError)throw new Error('Não foi possível verificar o saldo da WaveSpeedAI. Nenhum arquivo foi enviado e nenhuma geração foi iniciada. Tente novamente quando a conexão estiver disponível.');
+  if(!balanceData?.connected||!Number.isFinite(Number(balanceData.balance_usd)))throw new Error(balanceData?.error||'Não foi possível confirmar o saldo da WaveSpeedAI. Nenhuma geração foi iniciada.');
+  const availableBalance=Number(balanceData.balance_usd);
+  if(availableBalance+0.000001<estimatedCost)throw new Error('Saldo insuficiente na WaveSpeedAI. Saldo atual: US$ '+availableBalance.toFixed(2)+'; estimativa necessária: US$ '+estimatedCost.toFixed(2)+'. Nenhum arquivo foi enviado e nenhum crédito foi consumido.');
   const instructions=$('#detailText')?.value?.trim()||'';
   const general=$('#prompt')?.value?.trim()||'';
   const outfitDescription=outfit==='Manter roupa original'
