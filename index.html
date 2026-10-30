@@ -567,23 +567,24 @@ $('#projectForm').addEventListener('submit',async e=>{
   const details=[...document.querySelectorAll('input[name="detail"]:checked')].map(x=>x.value);
   const accessories=pvSelectedAll('accessory');
   const outfit=pvSelected('outfitMode');
-  const clothing=[pvSelected('clothingStyle'),pvSelected('setChoice'),$('#topChoice')?.value,$('#bottomChoice')?.value,$('#outfitColor')?.value,pvSelected('jerseyTeamChoice')?'Camisa '+pvSelected('jerseyTeamChoice'):'',pvSelected('teamShort')?'Short '+pvSelected('teamShort'):''].filter(Boolean).join(', ');
+  const clothing=[pvSelected('clothingStyle'),pvSelected('jerseyTeamChoice')?'camisa oficial do '+pvSelected('jerseyTeamChoice'):'',pvSelected('teamShort')?'short do '+pvSelected('teamShort'):'',($('#jerseyName')?.value?.trim()?'nome nas costas '+$('#jerseyName').value.trim():''),($('#jerseyNumber')?.value?.trim()?'número '+$('#jerseyNumber').value.trim():''),($('#jerseyFont')?.value?.trim()?'fonte '+$('#jerseyFont').value.trim():'')].filter(Boolean).join(', ');
   const instructions=$('#detailText')?.value?.trim()||'';
   const general=$('#prompt')?.value?.trim()||'';
+  const outfitDescription=outfit==='Manter roupa original'
+   ? 'Keep the exact original clothing from the driving video.'
+   : outfit==='Enviar minha roupa'
+    ? 'Use the clothing reference selected by the user if visually available; do not invent logos, patterns or garment details.'
+    : 'The replacement character must wear this exact selected outfit: '+(clothing||'the exact garment selected in the clothing catalog')+'. The selected outfit takes priority over the clothing visible in the character identity reference image. Do not keep or copy the reference image outfit when it conflicts with the selected outfit.';
   const prompt=[
-   'Edite diretamente o vídeo enviado. Preserve a cena original, o enquadramento, o movimento da câmera, a iluminação e a continuidade entre todos os quadros.',
-   'Tipo de transformação: '+(target||'Pessoa')+'.',
-   'Quantidade de pessoas a substituir: '+(count||1)+'.',
-   'Use a foto de referência enviada como identidade visual principal. Preserve o mesmo rosto, formato facial, olhos, nariz, boca, cabelo e tom de pele em todos os quadros; não invente outro rosto nem misture identidades.',
-   'Personagem escolhido: '+(character||'Manter o sujeito original, exceto pelas alterações solicitadas')+'.',
-   'Modo de roupa: '+(outfit||'conforme as escolhas')+'.',
-   'Roupas e vestuário: '+(clothing||'seguir as escolhas textuais disponíveis')+'.',
-   'Acessórios: '+(accessories.join(', ')||'nenhum acessório adicional')+'.',
-   'Detalhes visuais: '+(details.join(', ')||'manter aparência natural')+'.',
-   'Instruções adicionais: '+(instructions||'nenhuma')+'.',
-   'Orientação do usuário: '+(general||'aplicar as opções escolhidas no estúdio')+'.',
-   'Faça as alterações de forma realista e consistente em todos os quadros. Não altere elementos que não foram solicitados.'
-  ].join('\n');
+   'A realistic character-replacement video. Show the selected character '+(character||'from the supplied identity reference')+' performing the same action, pose, gestures, timing and movement as the person in the original driving video.',
+   'IDENTITY: Preserve the exact identity from the supplied character reference image: same face, facial proportions, eyes, nose, mouth, hairstyle and skin tone in every frame. Do not create a different face or blend identities.',
+   'WARDROBE: '+outfitDescription+' Accessories and details: '+(accessories.join(', ')||'no additional accessories')+'. '+(details.join(', ')||'Natural appearance')+'.',
+   'SCENE AND BACKGROUND: Reproduce the original driving video scene. Keep the same real location, background, walls, sky, furniture, objects, colors, lighting, shadows and depth. The original background must remain visually unchanged. Do not replace it with a blue, solid-color, studio, gradient or chroma-key background.',
+   'CAMERA AND COMPOSITION: Match the original video camera framing and shot scale exactly. Keep the character at the same distance from the camera and occupying the same proportion of the frame as the original person. Preserve the original camera angle, perspective, lens feel and camera movement. No zoom-in, no close-up, no crop, no reframing and no camera push-in.',
+   'Keep the original scene composition and all objects in their original positions. Only the person/character appearance and the explicitly selected wardrobe or accessories should differ from the source video.',
+   'Additional user instructions: '+(instructions||'None')+'. '+(general||'No other changes requested.')+'.',
+   'Consistent realistic appearance across every frame, with natural integration into the original scene.'
+  ].join('\\n');
   const aspect_ratio=$('input[name="format"]:checked')?.value.includes('9:16')?'9:16':$('input[name="format"]:checked')?.value.includes('16:9')?'16:9':'1:1';
   const description=[
    'TIPO: '+target,'DURAÇÃO: '+duration.toFixed(2)+' segundos',
