@@ -125,8 +125,18 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 .pv-wizard-panel[data-step="4"]>.pv-option-grid{margin-top:10px!important}
 .pv-wizard-panel[data-step="4"]>h2{margin-top:7px!important}
 .pv-wizard-panel[data-step="5"],.pv-wizard-panel[data-step="6"]{color:#f4f1ff!important}
-.pv-wizard-panel[data-step="5"] .pv-config-section,.pv-wizard-panel[data-step="6"] .pv-review-summary,.pv-wizard-panel[data-step="6"] .pv-review-list,.pv-wizard-panel[data-step="6"] .pv-format-section,.pv-wizard-panel[data-step="6"] .pv-generate-info{display:block!important;visibility:visible!important;opacity:1!important}
-.pv-wizard-panel[data-step="6"] .pv-review-list{display:grid!important}
+#projectForm .pv-wizard-panel[data-step="5"] .pv-config-section,
+#projectForm .pv-wizard-panel[data-step="5"] .pv-config-heading,
+#projectForm .pv-wizard-panel[data-step="5"] .pv-detail-grid,
+#projectForm .pv-wizard-panel[data-step="5"] .field,
+#projectForm .pv-wizard-panel[data-step="6"] .pv-review-summary,
+#projectForm .pv-wizard-panel[data-step="6"] .pv-review-list,
+#projectForm .pv-wizard-panel[data-step="6"] .pv-format-section,
+#projectForm .pv-wizard-panel[data-step="6"] .pv-generate-info{display:block!important;visibility:visible!important;opacity:1!important}
+#projectForm .pv-wizard-panel[data-step="5"] .pv-detail-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px!important}
+#projectForm .pv-wizard-panel[data-step="5"] .pv-detail{display:flex!important;visibility:visible!important;opacity:1!important}
+#projectForm .pv-wizard-panel[data-step="6"] .pv-review-list{display:grid!important}
+@media(max-width:600px){#projectForm .pv-wizard-panel[data-step="5"] .pv-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 </style>
 </head>
 <body>
@@ -406,13 +416,16 @@ function pvSelected(name){return document.querySelector('input[name="'+name+'"]:
 function pvSelectedAll(name){return [...document.querySelectorAll('input[name="'+name+'"]:checked')].map(x=>x.value)}
 function pvGoToStep(next){
  const target=Math.max(0,Math.min(6,Number(next)||0));
+ const panel=pvPanels.find(item=>Number(item.dataset.step)===target);
+ if(!panel){console.error('Etapa do PEVIA não encontrada:',target);return}
  pvStep=target;
- pvPanels.forEach(panel=>{
-  const active=Number(panel.dataset.step)===target;
-  panel.classList.toggle('active',active);
-  panel.hidden=!active;
-  panel.style.setProperty('display',active?'block':'none','important');
-  panel.setAttribute('aria-hidden',active?'false':'true');
+ pvPanels.forEach(item=>{
+  const active=item===panel;
+  item.classList.toggle('active',active);
+  item.hidden=!active;
+  item.style.setProperty('display',active?'block':'none','important');
+  item.style.setProperty('visibility',active?'visible':'hidden','important');
+  item.setAttribute('aria-hidden',active?'false':'true');
  });
  document.querySelectorAll('.pv-step[data-pv-step]').forEach(step=>{
   const n=Number(step.dataset.pvStep);
@@ -424,7 +437,14 @@ function pvGoToStep(next){
  $('#pvNext').classList.toggle('hidden',target===6);
  $('#pvGenerate').classList.toggle('hidden',target!==6);
  $('#pvStepLabel').textContent='Etapa '+(target+1)+' de 7';
- if(target===6)pvReview();
+ if(target===6){
+  try{pvReview()}
+  catch(err){
+   console.error('Falha ao montar revisão do PEVIA:',err);
+   const box=$('#pvReviewList');
+   if(box)box.innerHTML='<p class="studio-help">Não foi possível montar o resumo. Suas escolhas continuam salvas nesta tela. Volte uma etapa e tente novamente.</p>';
+  }
+ }
 }
 function pvUpdate(){pvGoToStep(pvStep)}
 function pvReview(){
