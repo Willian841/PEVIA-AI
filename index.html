@@ -281,7 +281,7 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
    <button type="button" class="btn primary pv-access-cta" data-plan-interest="premium">Quero meu acesso agora →</button>
   </article>
  </div>
- <p class="pv-access-payment-note">A escolha do plano ainda não inicia uma cobrança. O checkout e a confirmação do pagamento serão conectados antes de liberar o estúdio.</p>
+ <p class="pv-access-payment-note">Escolha PIX ou cartão e finalize o pagamento nesta própria tela do PEVIA.</p>
 </div>
 <div class="pv-wizard-layout">
  <div class="pv-wizard-main">
@@ -515,16 +515,6 @@ async function refreshPlanStatus(){
 }
 async function showDashboard(user){currentUser=user;landing.style.display='none';dashboard.classList.add('active');$('#userLabel').textContent=user.email||'Minha conta';await checkAdminAccess(user);await refreshPlanStatus();await renderProjects();showTab('overview')}
 function showTab(tab){if(tab==='admin'&&!isPeviaAdmin)tab='overview';['overview','create','history','admin'].forEach(t=>$('#tab-'+t).classList.toggle('hidden',t!==tab));document.querySelectorAll('.side-link[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));if(tab==='admin'){renderAdminMedia();renderAdminPayments()}}
-document.querySelectorAll('[data-plan-interest]').forEach(b=>b.addEventListener('click',async()=>{
- if(!currentUser||!supabaseClient){startCreationAfterAuth=true;openModal('login');return}
- const plan=b.dataset.planInterest, original=b.textContent;b.disabled=true;b.textContent='Preparando pagamento...';
- try{
-  const {data,error}=await supabaseClient.functions.invoke('pevia-create-checkout',{body:{plan}});
-  if(error)throw new Error(data?.error||error.message||'Não foi possível iniciar o pagamento.');
-  if(!data?.checkout_url)throw new Error(data?.error||'O Mercado Pago não retornou o link de pagamento.');
-  window.location.assign(data.checkout_url);
- }catch(err){console.error('Falha ao iniciar checkout:',err);alert(err.message||'Não foi possível abrir o Mercado Pago.');b.disabled=false;b.textContent=original}
-}));
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.goto)));
 $('#logout').onclick=async()=>{if(supabaseClient)await supabaseClient.auth.signOut();currentUser=null;projects=[];isPeviaAdmin=false;$('#adminNav').classList.add('hidden');$('#planStatus').textContent='Plano pendente';$('#planStatus').classList.remove('active');dashboard.classList.remove('active');landing.style.display='block'};
 async function renderAdminMedia(){if(!isPeviaAdmin||!supabaseClient)return;const box=$('#homeMediaList');box.textContent='Carregando vídeos...';const {data,error}=await supabaseClient.from('site_media').select('id,placement,title,storage_path,is_active,created_at').order('created_at',{ascending:false});if(error){box.textContent='Erro ao carregar: '+error.message;return}if(!data?.length){box.textContent='Nenhum vídeo publicado.';return}box.innerHTML=data.map(item=>'<div class="project"><div><strong>'+escapeHtml(item.title||'Vídeo sem título')+'</strong><div class="muted">'+(item.placement==='hero'?'Banner principal':'Galeria')+' · '+(item.is_active?'Publicado':'Removido')+'</div></div>'+(item.is_active?'<button class="btn" data-deactivate-media="'+item.id+'">Remover</button>':'<span class="status">Inativo</span>')+'</div>').join('');box.querySelectorAll('[data-deactivate-media]').forEach(btn=>btn.addEventListener('click',async()=>{if(!confirm('Remover este vídeo da página inicial?'))return;const {error}=await supabaseClient.from('site_media').update({is_active:false,updated_at:new Date().toISOString()}).eq('id',btn.dataset.deactivateMedia);if(error){alert('Não foi possível remover: '+error.message);return}await renderAdminMedia();await renderHomeMedia()}))}
