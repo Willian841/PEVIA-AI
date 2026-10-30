@@ -177,7 +177,10 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
   #tab-create > #pvAccessPlans { padding: 18px 14px 30px !important; }
   #tab-create > #pvAccessPlans .pv-access-heading h2 { font-size: 27px; }
 }
-\n</style>
+
+#tab-create:not(.hidden) { display: block !important; }
+#tab-create:not(.hidden) #pvAccessPlans { display: block !important; visibility: visible !important; opacity: 1 !important; }
+</style>
 </head>
 <body>
 <div id="landing">
