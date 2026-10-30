@@ -153,6 +153,13 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 
 /* Seletor de planos antes do estúdio */
 .pv-access-plans{max-width:1040px;margin:26px auto 50px}.pv-access-heading{text-align:center;margin:0 auto 25px}.pv-access-heading h2{font-size:clamp(27px,4vw,38px);margin:8px 0}.pv-access-heading p{color:#aaa8bb;margin:0}.pv-access-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:16px;align-items:stretch}.pv-access-card{padding:25px;border:1px solid #34364a;border-radius:17px;background:linear-gradient(145deg,#171827,#10111b)}.pv-access-premium{border-color:#67e8f988;background:radial-gradient(ellipse at 90% 0,#0e749033,transparent 45%),linear-gradient(145deg,#1b1b30,#111321);box-shadow:0 15px 45px #0005}.pv-access-label{font-size:10px;letter-spacing:1.5px;font-weight:900;color:#bae6fd}.pv-access-card h3{font-size:22px;margin:13px 0 5px}.pv-access-price{font-size:32px;font-weight:900;letter-spacing:-1px;color:#67e8f9}.pv-access-price small{font-size:11px;font-weight:500;letter-spacing:0;color:#aaa8bb}.pv-access-old{font-size:13px;color:#9290a1;text-decoration:line-through;margin-top:10px}.pv-access-description{font-size:12px;color:#aaa8bb;min-height:38px}.pv-access-card ul{list-style:none;padding:0;margin:18px 0;display:grid;gap:10px}.pv-access-card li{font-size:12px;color:#e4e2ef;line-height:1.4}.pv-access-card li strong{color:#67e8f9}.pv-access-card li.pv-access-locked{color:#a19eb0}.pv-access-cta{width:100%;margin-top:8px}.pv-access-payment-note{text-align:center;color:#9b99aa;font-size:11px;margin:17px auto 0;max-width:680px}.pv-wizard-layout{display:none!important}
+.pv-access-promo-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.pv-access-promo-badge{display:inline-flex;align-items:center;padding:7px 10px;border-radius:30px;background:#f59e0b20;border:1px solid #f59e0b88;color:#fbbf24;font-size:10px;font-weight:900;letter-spacing:1px}
+.pv-access-basic-promo{border-color:#f59e0b88;background:radial-gradient(ellipse at 10% 0,#f59e0b18,transparent 48%),linear-gradient(145deg,#1b1a27,#10111b)}
+.pv-access-countdown-wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:13px 0;padding:11px 12px;border:1px solid #f59e0b55;border-radius:10px;background:#f59e0b12}
+.pv-access-countdown-wrap span{font-size:9px;font-weight:900;letter-spacing:1px;color:#fbbf24}
+.pv-access-countdown-wrap strong{font-size:14px;color:#fff;font-variant-numeric:tabular-nums;white-space:nowrap}
+@media(max-width:700px){.pv-access-countdown-wrap{align-items:flex-start;flex-direction:column;gap:4px}}
 @media(max-width:700px){.pv-access-plans{margin:18px 0 35px}.pv-access-grid{grid-template-columns:1fr}.pv-access-card{padding:21px}.pv-access-description{min-height:0}}
 
 
@@ -244,12 +251,15 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 <div class="pv-access-plans" id="pvAccessPlans">
  <div class="pv-access-heading"><button type="button" class="btn pv-plan-back" data-goto="overview">← Voltar</button><span class="pv-eyebrow">🔒 ACESSO AO ESTÚDIO</span><h2>Escolha seu plano para continuar</h2><p>Os planos aparecem aqui antes de qualquer etapa de criação.</p></div>
  <div class="pv-access-grid">
-  <article class="pv-access-card">
-   <span class="pv-access-label">PLANO BÁSICO</span><h3>Comece a criar</h3>
-   <div class="pv-access-price">R$ 9,00 <small>/ 20 dias</small></div>
-   <p class="pv-access-description">Para quem quer começar com uma transformação por vídeo.</p>
-   <ul><li>✓ 8 créditos incluídos</li><li>✓ Até <strong>1 pessoa por vídeo</strong></li><li>✓ Acesso às ferramentas básicas de criação</li><li class="pv-access-locked">🔒 Substituição de 2 a 5 pessoas bloqueada</li></ul>
-   <button type="button" class="btn pv-access-cta" data-plan-interest="basic">Quero meu acesso básico</button>
+  <article class="pv-access-card pv-access-basic-promo">
+   <div class="pv-access-promo-top"><span class="pv-access-label">PLANO BÁSICO</span><span class="pv-access-promo-badge">🔥 PROMOÇÃO</span></div>
+   <h3>Comece a criar</h3>
+   <div class="pv-access-old">De R$ 28,99</div>
+   <div class="pv-access-price">Por R$ 9,00 <small>/ 20 dias</small></div>
+   <div class="pv-access-countdown-wrap"><span>⏳ A PROMOÇÃO TERMINA EM</span><strong id="pvBasicCountdown" aria-live="off">20 dias 00:00:00</strong></div>
+   <p class="pv-access-description">Oferta especial de lançamento: aproveite 20 dias de acesso ao PEVIA.</p>
+   <ul><li>✓ 8 créditos incluídos</li><li>✓ Até <strong>1 pessoa por vídeo</strong></li><li>✓ Criador de avatar com <strong>mais de 25 looks</strong></li><li>✓ Personagem em pessoa real</li><li>✓ Prompts prontos para suas criações</li><li>✓ Curso completo passo a passo</li><li class="pv-access-locked">🔒 Substituição de 2 a 5 pessoas bloqueada</li></ul>
+   <button type="button" class="btn pv-access-cta" data-plan-interest="basic">Quero aproveitar a promoção</button>
   </article>
   <article class="pv-access-card pv-access-premium">
    <span class="pv-access-label">✦ PLANO PREMIUM · ACESSO COMPLETO</span><h3>Tenha todos os recursos</h3>
@@ -772,4 +782,20 @@ $('#projectForm').addEventListener('submit',async e=>{
 });
 if(supabaseClient)supabaseClient.auth.getSession().then(({data})=>{if(data.session)showDashboard(data.session.user)}).catch(err=>console.error('Falha ao recuperar sessão:',err));
 if(supabaseClient)supabaseClient.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'&&session&&!currentUser)showDashboard(session.user)});
+// Contagem regressiva da promoção do plano Básico (encerramento em 19/11/2026 às 23:59 no horário de Brasília).
+(function(){
+ const output=document.getElementById('pvBasicCountdown');
+ if(!output)return;
+ const deadline=new Date('2026-11-19T23:59:59-03:00').getTime();
+ const render=()=>{
+  const remaining=Math.max(0,deadline-Date.now());
+  const days=Math.floor(remaining/86400000);
+  const hours=Math.floor((remaining%86400000)/3600000);
+  const minutes=Math.floor((remaining%3600000)/60000);
+  const seconds=Math.floor((remaining%60000)/1000);
+  output.textContent=remaining<=0?'Promoção encerrada':days+'d '+String(hours).padStart(2,'0')+':'+String(minutes).padStart(2,'0')+':'+String(seconds).padStart(2,'0');
+ };
+ render();
+ setInterval(render,1000);
+})();
 </script></body></html>
