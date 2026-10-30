@@ -337,6 +337,12 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 </section>
 <section id="tab-admin" class="hidden">
 <div class="dash-title"><div><span class="tag">ADMINISTRAÇÃO</span><h1>Vídeos da página inicial</h1><p class="muted">Envie, substitua ou remova o vídeo do banner e da galeria.</p></div></div>
+<div class="panel" style="margin-bottom:16px">
+<h2>Conexão com a IA</h2>
+<p class="muted">Verifique a chave da WaveSpeedAI e o saldo disponível. Esta verificação não gera vídeos nem consome créditos.</p>
+<button class="btn primary" id="aiConnectionTest" type="button">Testar conexão da IA</button>
+<p class="muted" id="aiConnectionMessage" role="status" aria-live="polite"></p>
+</div>
 <div class="panel">
 <h2>Gerenciar vídeo</h2>
 <form id="homeMediaForm">
@@ -364,6 +370,20 @@ $('#closeModal').onclick=()=>modal.classList.remove('open');modal.addEventListen
 $('#authForm').addEventListener('submit',async e=>{e.preventDefault();const email=$('#authEmail').value.trim(),password=$('#authPassword').value;const submit=$('#authSubmit');submit.disabled=true;submit.textContent='Aguarde...';$('#authMessage').textContent='Conectando com segurança...';
 try{if(!supabaseClient)throw new Error('O serviço de autenticação não carregou. Atualize a página e tente novamente.');let result;if(authMode==='signup'){result=await supabaseClient.auth.signUp({email,password,options:{emailRedirectTo:'https://willian841.github.io/PEVIA-AI/'}});if(!result.error&&!result.data.session){$('#authMessage').textContent='Cadastro iniciado! Confira seu e-mail para confirmar a conta e depois volte para entrar.';return}}else{result=await supabaseClient.auth.signInWithPassword({email,password})}if(result.error)throw result.error;currentUser=result.data.user;modal.classList.remove('open');await showDashboard(currentUser);if(startCreationAfterAuth){showTab('create');startCreationAfterAuth=false}}catch(err){$('#authMessage').textContent=err.message||'Não foi possível concluir. Tente novamente.'}finally{submit.disabled=false;$('#authSubmit').textContent=authMode==='signup'?'Criar conta':'Entrar'}});
 let isPeviaAdmin=false;
+$('#aiConnectionTest')?.addEventListener('click',async()=>{
+ const button=$('#aiConnectionTest'),message=$('#aiConnectionMessage');
+ if(!isPeviaAdmin||!currentUser||!supabaseClient){message.textContent='Entre como administrador para testar a conexão.';return}
+ button.disabled=true;button.textContent='Verificando...';message.textContent='Consultando a WaveSpeedAI com segurança...';
+ try{
+  const {data,error}=await supabaseClient.functions.invoke('pevia-wavespeed-balance',{body:{}});
+  if(error)throw error;
+  if(!data?.connected)throw new Error(data?.error||'Não foi possível confirmar a conexão.');
+  message.textContent='Conexão confirmada! Saldo disponível: US$ '+Number(data.balance_usd).toFixed(2)+'. Nenhuma geração foi iniciada.';
+ }catch(err){
+  console.error('Falha ao testar WaveSpeedAI:',err);
+  message.textContent='Não foi possível confirmar: '+(err.message||'verifique a função e a chave no Supabase.');
+ }finally{button.disabled=false;button.textContent='Testar conexão da IA'}
+});
 async function checkAdminAccess(user){try{const {data,error}=await supabaseClient.from('profiles').select('role').eq('id',user.id).maybeSingle();if(error)throw error;isPeviaAdmin=data?.role==='admin';$('#adminNav').classList.toggle('hidden',!isPeviaAdmin);return isPeviaAdmin}catch(err){console.error('Não foi possível validar administrador:',err);isPeviaAdmin=false;$('#adminNav').classList.add('hidden');return false}}
 async function showDashboard(user){currentUser=user;landing.style.display='none';dashboard.classList.add('active');$('#userLabel').textContent=user.email||'Minha conta';await checkAdminAccess(user);await renderProjects();showTab('overview')}
 function showTab(tab){if(tab==='admin'&&!isPeviaAdmin)tab='overview';['overview','create','history','admin'].forEach(t=>$('#tab-'+t).classList.toggle('hidden',t!==tab));document.querySelectorAll('.side-link[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));if(tab==='admin')renderAdminMedia()}
