@@ -25,6 +25,17 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 .visual-section-title{font-size:13px;font-weight:700;margin:16px 0 6px;color:#ddd6fe}.jersey-card .visual-name{text-align:center}.jersey-card .visual-desc{text-align:center}
 @media(min-width:760px){.visual-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.visual-card img{height:112px}.character-grid .visual-card img{height:64px}.jersey-grid .visual-card img,.shorts-grid .visual-card img{height:120px}}
 @media(max-width:390px){.visual-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.visual-card img{height:88px}.visual-card .visual-name{font-size:12px}.visual-card .visual-desc{font-size:10px}}
+
+/* Galeria de rostos compacta, no estilo de selecao do AvatarViral */
+.character-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:8px 0}
+.character-grid .visual-card{padding:4px;gap:3px;border-radius:8px;min-width:0}
+.character-grid .visual-card img{height:56px;width:100%;object-fit:cover;object-position:center 18%;border-radius:5px}
+.character-grid .visual-card .visual-name{font-size:11px;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.character-grid .visual-card .visual-desc{display:none}
+.character-grid .visual-card:has(input:checked)::after{top:5px;right:5px;width:17px;height:17px;font-size:11px}
+@media(min-width:760px){.character-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}.character-grid .visual-card img{height:58px}}
+@media(max-width:390px){.character-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.character-grid .visual-card img{height:54px}.character-grid .visual-card .visual-name{font-size:10px}}
+
 </style>
 </head>
 <body>
