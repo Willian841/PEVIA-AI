@@ -252,8 +252,8 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
     <div class="pv-review-summary"><span>✦</span><div><strong>Seu projeto está quase pronto</strong><p>Revise os arquivos, personagem, visual e acabamento antes de salvar.</p></div></div>
     <div class="pv-review-list" id="pvReviewList"></div>
     <section class="pv-config-section pv-format-section"><div class="pv-config-heading"><span>08</span><div><h3>Formato de saída</h3><p>Escolha onde pretende publicar seu vídeo.</p></div></div><div class="pv-format-options"><label><input id="format" type="radio" name="format" value="Vertical 9:16" checked><strong>9:16</strong><span>Vertical · Reels / TikTok</span></label><label><input type="radio" name="format" value="Horizontal 16:9"><strong>16:9</strong><span>Horizontal · YouTube</span></label><label><input type="radio" name="format" value="Quadrado 1:1"><strong>1:1</strong><span>Quadrado · Feed</span></label></div></section>
-    <div class="pv-generate-info"><span>⏱</span><div><strong>Sobre o processamento</strong><p>O PEVIA salvará as configurações. A geração real do vídeo será iniciada quando o serviço de IA estiver integrado.</p></div></div>
-    <p class="pv-save-disclaimer">Ao continuar, suas escolhas serão salvas em Meus projetos.</p>
+    <div class="pv-generate-info"><span>⏱</span><div><strong>Geração de teste · Wan 2.2 · 480p</strong><p>O teste usa o vídeo original e as instruções em texto. Limite atual: 20 segundos. O modelo atual não recebe as imagens personalizadas de personagem/roupa; essas referências visuais ainda não serão aplicadas.</p></div></div>
+    <label class="pv-save-disclaimer" style="display:flex;gap:10px;align-items:flex-start;text-align:left"><input id="pvExternalConsent" type="checkbox" style="margin-top:4px;flex:0 0 auto"><span>Autorizo o envio do meu vídeo original à WaveSpeedAI, provedora externa, para processar esta edição. Entendo que o teste pode consumir créditos da conta PEVIA e que o arquivo será processado por esse serviço.</span></label>
    </div>
    <div class="pv-wizard-controls"><button class="btn" type="button" id="pvBack" disabled>← Voltar</button><span id="pvStepLabel">Etapa 1 de 7</span><button class="btn primary" type="button" id="pvNext">Continuar →</button><button class="btn primary hidden" type="submit" id="pvGenerate">Gerar vídeo ✦</button></div>
   </form>
@@ -355,6 +355,13 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 </div>
 <div class="panel" style="margin-top:16px"><h2>Vídeos publicados</h2><div id="homeMediaList" class="empty">Carregando...</div></div>
 </section></main></div></div>
+<style>
+#pvResultModal{z-index:20}
+#pvResultModal .modalbox{max-width:760px}
+#pvResultVideo{display:block;width:100%;max-height:65vh;background:#05060b;border-radius:12px;margin:16px 0}
+.pv-result-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+</style>
+<div class="modal" id="pvResultModal"><div class="modalbox"><button class="close" id="pvResultClose" aria-label="Fechar">×</button><span class="tag">PEVIA · RESULTADO</span><h3>Seu vídeo está pronto!</h3><p id="pvResultMessage" class="muted">A edição foi concluída.</p><video id="pvResultVideo" controls playsinline></video><div class="pv-result-actions"><a class="btn primary" id="pvResultDownload" href="#" target="_blank" rel="noopener">Abrir / baixar vídeo</a></div></div></div>
 <div class="modal" id="accessModal"><div class="modalbox"><button class="close" id="closeModal" aria-label="Fechar">×</button><span class="tag">CONTA PEVIA</span><h3 id="modalTitle">Entre no seu estúdio</h3><p id="authMessage">Acesse sua conta ou crie seu cadastro para usar o PEVIA.</p><form id="authForm"><div class="field"><label for="authEmail">E-mail</label><input id="authEmail" type="email" required autocomplete="email" placeholder="voce@email.com"></div><div class="field"><label for="authPassword">Senha</label><input id="authPassword" type="password" required minlength="6" autocomplete="current-password" placeholder="Mínimo de 6 caracteres"></div><button class="btn primary" id="authSubmit" style="width:100%" type="submit">Entrar</button></form><p style="text-align:center;margin-bottom:0"><button class="side-link" id="toggleAuth" type="button" style="text-align:center">Ainda não tem conta? Criar cadastro</button></p></div></div>
 <script>
 const $=s=>document.querySelector(s), modal=$('#accessModal'), landing=$('#landing'), dashboard=$('#dashboard');
@@ -481,7 +488,122 @@ $('#sourceVideo').addEventListener('change',e=>{const file=e.target.files[0];$('
 $('#customCharacter').addEventListener('change',e=>$('#pvPhotoName').textContent=e.target.files[0]?.name||'Nenhuma foto selecionada');$('#replaceReference')?.addEventListener('change',e=>$('#replaceReferenceName').textContent=e.target.files[0]?.name||'Nenhum arquivo de referência selecionado');
 $('#customClothing').addEventListener('change',e=>$('#clothingFileName').textContent=e.target.files[0]?.name||'Nenhuma imagem selecionada');
 pvUpdate();
-$('#projectForm').addEventListener('submit',async e=>{e.preventDefault();if(!currentUser){openModal('login');return}const button=$('#pvGenerate');button.disabled=true;button.textContent='Salvando projeto...';let timeoutId;try{if(!supabaseClient)throw new Error('A conexão com o banco de dados não está disponível.');const videoFile=$('#sourceVideo').files[0];if(!videoFile)throw new Error('Adicione o vídeo original antes de continuar.');const count=Number(pvSelected('replaceCount'));const target=pvSelected('targetType');const characterList=pvSelectedAll('character');const avatarParts=['avatarHair','avatarFace','avatarBody','avatarBeard'].map(n=>pvSelected(n)).filter(Boolean).join(', ');const character=characterList.join(', ')||(avatarParts?'Avatar personalizado: '+avatarParts+'; '+($('#avatarDescription')?.value?.trim()||'Sem detalhes adicionais'):($('#avatarDescription')?.value?.trim()?'Avatar personalizado: '+$('#avatarDescription').value.trim():($('#customCharacter').files[0]?.name||'Personagem não selecionado')));const details=[...document.querySelectorAll('input[name="detail"]:checked')].map(x=>x.value);const accessories=pvSelectedAll('accessory');const description=['TIPO: '+target,'VÍDEO: '+videoFile.name,'REFERÊNCIA PESSOA/PET: '+($('#replaceReference').files[0]?.name||'Não enviada'),'AVATAR - CABELO: '+(pvSelected('avatarHair')||'Não selecionado'),'AVATAR - ROSTO: '+(pvSelected('avatarFace')||'Não selecionado'),'AVATAR - CORPO: '+(pvSelected('avatarBody')||'Não selecionado'),'AVATAR - BARBA: '+(pvSelected('avatarBeard')||'Não selecionado'),'QUANTIDADE: '+count,'PERSONAGENS: '+character,'CAMISA DO AVATAR: '+(pvSelected('avatarTop')||'Não selecionada'),'CALÇADO DO AVATAR: '+(pvSelected('avatarFootwear')||'Não selecionado'),'DESCRIÇÃO DO AVATAR: '+($('#avatarDescription')?.value?.trim()||'Não informada'),'MODO DE ROUPA: '+pvSelected('outfitMode'),'ROUPA: '+(pvSelected('clothingStyle')||'Não selecionada'),'CONJUNTO: '+(pvSelected('setChoice')||'Não selecionado'),'PARTE DE CIMA: '+($('#topChoice')?.value||'Não selecionada'),'PARTE DE BAIXO: '+($('#bottomChoice')?.value||'Não selecionada'),'COR/DETALHES DA ROUPA: '+($('#outfitColor')?.value||'Não informado'),'TIME: '+(pvSelected('jerseyTeamChoice')||'Não selecionado'),'SHORT DO TIME: '+(pvSelected('teamShort')||'Não selecionado'),'NOME NA CAMISA: '+($('#jerseyName')?.value.trim()||'Não informado'),'NÚMERO NA CAMISA: '+($('#jerseyNumber')?.value||'Não informado'),'ESTILO DA CAMISA: '+($('#jerseyFont')?.value||'Não selecionado'),'ROUPA ENVIADA: '+($('#customClothing').files[0]?.name||'Não enviada'),'FOTO DE REFERÊNCIA: '+($('#customCharacter').files[0]?.name||'Não enviada'),'ACESSÓRIOS: '+(accessories.join(', ')||'Nenhum'),'DETALHES: '+(details.join(', ')||'Nenhum'),'INSTRUÇÕES: '+($('#detailText').value.trim()||'Nenhuma'),'ORIENTAÇÃO: '+($('#prompt').value.trim()||'Nenhuma'),'FORMATO: '+$('#format').value].join('\n\n');const aspect_ratio=$('#format').value.includes('9:16')?'9:16':$('#format').value.includes('16:9')?'16:9':'1:1';const controller=new AbortController();timeoutId=setTimeout(()=>controller.abort(),20000);let result;try{result=await supabaseClient.from('projects').insert({user_id:currentUser.id,name:$('#projectName').value.trim(),description,aspect_ratio}).abortSignal(controller.signal)}finally{clearTimeout(timeoutId)}if(result.error)throw result.error;await renderProjects();showTab('history');alert('Configurações salvas! A geração de vídeo por IA ainda precisa ser conectada ao serviço de processamento.')}catch(err){console.error('Falha ao salvar projeto:',err);alert('Não foi possível salvar o projeto: '+(err.name==='AbortError'?'O banco de dados não respondeu em 20 segundos.':(err.message||'erro desconhecido')))}finally{if(timeoutId)clearTimeout(timeoutId);button.disabled=false;button.textContent='Gerar vídeo ✦'}});
+async function pvReadVideoDuration(file){
+ return await new Promise((resolve,reject)=>{
+  const url=URL.createObjectURL(file),video=document.createElement('video');let finished=false;
+  const done=(fn,value)=>{if(finished)return;finished=true;URL.revokeObjectURL(url);video.removeAttribute('src');video.load();fn(value)};
+  video.preload='metadata';video.onloadedmetadata=()=>done(resolve,video.duration);video.onerror=()=>done(reject,new Error('Não foi possível ler a duração do vídeo. Envie um MP4, WebM ou MOV válido.'));video.src=url;
+  setTimeout(()=>done(reject,new Error('A leitura do vídeo demorou demais. Tente outro arquivo.')),12000);
+ });
+}
+function pvOpenResult(url){
+ const modalResult=$('#pvResultModal'),video=$('#pvResultVideo'),download=$('#pvResultDownload');
+ video.src=url;download.href=url;modalResult.classList.add('open');video.load();
+}
+$('#pvResultClose').addEventListener('click',()=>{$('#pvResultModal').classList.remove('open');$('#pvResultVideo').pause()});
+$('#pvResultModal').addEventListener('click',e=>{if(e.target.id==='pvResultModal'){$('#pvResultModal').classList.remove('open');$('#pvResultVideo').pause()}});
+$('#projectForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ if(!currentUser){openModal('login');return}
+ const button=$('#pvGenerate');let uncertainSubmission=false,projectId=null;
+ button.disabled=true;button.textContent='Preparando vídeo...';
+ try{
+  if(!supabaseClient)throw new Error('A conexão com o banco de dados não está disponível.');
+  if(!isPeviaAdmin)throw new Error('A geração está liberada apenas para o administrador durante os testes.');
+  if(!$('#pvExternalConsent').checked)throw new Error('Marque a autorização para enviar o vídeo à WaveSpeedAI.');
+  const videoFile=$('#sourceVideo').files[0];
+  if(!videoFile)throw new Error('Adicione o vídeo original antes de continuar.');
+  if(videoFile.size>200*1024*1024)throw new Error('O vídeo ultrapassa o limite de 200 MB.');
+  if(!['video/mp4','video/webm','video/quicktime'].includes(videoFile.type))throw new Error('Envie um vídeo MP4, WebM ou MOV.');
+  const duration=await pvReadVideoDuration(videoFile);
+  if(!Number.isFinite(duration)||duration<=0||duration>20.05)throw new Error('Para este teste, o vídeo precisa ter no máximo 20 segundos.');
+  const estimatedCost=Math.ceil(duration)*0.04;
+  if(!confirm('Este teste enviará seu vídeo à WaveSpeedAI. Estimativa para '+Math.ceil(duration)+'s em 480p: US$ '+estimatedCost.toFixed(2)+'. O provedor faz a cobrança real conforme a duração. Deseja continuar?'))throw new Error('Geração cancelada. Nenhum vídeo foi enviado à IA.');
+  const count=Number(pvSelected('replaceCount'));
+  const target=pvSelected('targetType');
+  const characterList=pvSelectedAll('character');
+  const avatarParts=['avatarHair','avatarFace','avatarBody','avatarBeard'].map(n=>pvSelected(n)).filter(Boolean).join(', ');
+  const character=characterList.join(', ')||(avatarParts?'Avatar personalizado: '+avatarParts+'; '+($('#avatarDescription')?.value?.trim()||'Sem detalhes adicionais'):($('#avatarDescription')?.value?.trim()?'Avatar personalizado: '+$('#avatarDescription').value.trim():'Personagem não selecionado'));
+  const details=[...document.querySelectorAll('input[name="detail"]:checked')].map(x=>x.value);
+  const accessories=pvSelectedAll('accessory');
+  const outfit=pvSelected('outfitMode');
+  const clothing=[pvSelected('clothingStyle'),pvSelected('setChoice'),$('#topChoice')?.value,$('#bottomChoice')?.value,$('#outfitColor')?.value,pvSelected('jerseyTeamChoice')?'Camisa '+pvSelected('jerseyTeamChoice'):'',pvSelected('teamShort')?'Short '+pvSelected('teamShort'):''].filter(Boolean).join(', ');
+  const instructions=$('#detailText')?.value?.trim()||'';
+  const general=$('#prompt')?.value?.trim()||'';
+  const prompt=[
+   'Edite diretamente o vídeo enviado. Preserve a cena original, o enquadramento, o movimento da câmera, a iluminação e a continuidade entre todos os quadros.',
+   'Tipo de transformação: '+(target||'Pessoa')+'.',
+   'Quantidade de pessoas a substituir: '+(count||1)+'.',
+   'Personagem escolhido: '+(character||'Manter o sujeito original, exceto pelas alterações solicitadas')+'.',
+   'Modo de roupa: '+(outfit||'conforme as escolhas')+'.',
+   'Roupas e vestuário: '+(clothing||'seguir as escolhas textuais disponíveis')+'.',
+   'Acessórios: '+(accessories.join(', ')||'nenhum acessório adicional')+'.',
+   'Detalhes visuais: '+(details.join(', ')||'manter aparência natural')+'.',
+   'Instruções adicionais: '+(instructions||'nenhuma')+'.',
+   'Orientação do usuário: '+(general||'aplicar as opções escolhidas no estúdio')+'.',
+   'Faça as alterações de forma realista e consistente em todos os quadros. Não altere elementos que não foram solicitados.'
+  ].join('\n');
+  const aspect_ratio=$('input[name="format"]:checked')?.value.includes('9:16')?'9:16':$('input[name="format"]:checked')?.value.includes('16:9')?'16:9':'1:1';
+  const description=[
+   'TIPO: '+target,'DURAÇÃO: '+duration.toFixed(2)+' segundos',
+   'PERSONAGEM: '+character,'MODO DE ROUPA: '+outfit,'ROUPA: '+clothing,
+   'ACESSÓRIOS: '+(accessories.join(', ')||'Nenhum'),'DETALHES: '+(details.join(', ')||'Nenhum'),
+   'INSTRUÇÕES: '+(instructions||'Nenhuma'),'ORIENTAÇÃO: '+(general||'Nenhuma'),
+   'FORMATO: '+aspect_ratio,'MODELO: Wan 2.2 Video Edit · 480p',
+   'OBSERVAÇÃO: Imagens personalizadas de referência não foram enviadas; o modelo recebeu o vídeo e as instruções em texto.'
+  ].join('\n\n');
+  const {data:created,error:createError}=await supabaseClient.from('projects').insert({
+   user_id:currentUser.id,name:$('#projectName').value.trim(),description,aspect_ratio,status:'pending'
+  }).select('id').single();
+  if(createError)throw createError;
+  projectId=created.id;
+  const extension=(videoFile.name.split('.').pop()||'mp4').toLowerCase().replace(/[^a-z0-9]/g,'')||'mp4';
+  const sourcePath=currentUser.id+'/'+projectId+'/source.'+extension;
+  button.textContent='Enviando vídeo com segurança...';
+  const {error:uploadError}=await supabaseClient.storage.from('pevia-user-media').upload(sourcePath,videoFile,{upsert:false,contentType:videoFile.type});
+  if(uploadError)throw new Error('Não foi possível enviar o vídeo ao armazenamento privado: '+uploadError.message);
+  button.textContent='Iniciando IA...';
+  const {data:startData,error:startError}=await supabaseClient.functions.invoke('pevia-generate-video',{
+   body:{action:'start',projectId,sourcePath,prompt,durationSeconds:duration}
+  });
+  if(startError){
+   if(startData?.error)throw new Error(startData.error);
+   uncertainSubmission=true;
+   throw new Error('Não foi possível confirmar se a WaveSpeedAI recebeu a tarefa. Para evitar cobrança duplicada, não clique novamente; verifique o histórico da WaveSpeedAI.');
+  }
+  if(!startData?.accepted)throw new Error(startData?.error||'A IA não aceitou o vídeo.');
+  uncertainSubmission=true;
+  button.textContent='IA editando seu vídeo...';
+  $('#pvResultMessage').textContent='A IA está editando seu vídeo. Isso pode levar alguns minutos. Não feche esta página.';
+  for(let attempt=0;attempt<90;attempt++){
+   await new Promise(resolve=>setTimeout(resolve,5000));
+   const {data:statusData,error:statusError}=await supabaseClient.functions.invoke('pevia-generate-video',{body:{action:'status',projectId}});
+   if(statusError||!statusData){
+    button.textContent='Aguardando resultado...';
+    continue;
+   }
+   if(statusData.status==='completed'&&statusData.videoUrl){
+    uncertainSubmission=false;
+    pvOpenResult(statusData.videoUrl);
+    await renderProjects();
+    button.textContent='Gerar vídeo ✦';
+    return;
+   }
+   if(statusData.status==='failed')throw new Error(statusData.error||'A IA não conseguiu concluir o vídeo.');
+   button.textContent='IA editando... '+Math.min(99,Math.round((attempt+1)/90*100))+'%';
+  }
+  throw new Error('A geração continua em andamento. Não envie novamente. Atualize a página mais tarde e consulte o histórico do provedor antes de iniciar outra tarefa.');
+ }catch(err){
+  console.error('Falha na geração do PEVIA:',err);
+  if(projectId&&!uncertainSubmission){
+   await supabaseClient.from('projects').update({status:'failed',generation_error:err.message||'Falha na preparação'}).eq('id',projectId);
+  }
+  alert(err.message||'Não foi possível gerar o vídeo.');
+ }finally{
+  if(!uncertainSubmission){button.disabled=false;button.textContent='Gerar vídeo ✦'}
+  await renderProjects();
+ }
+});
 if(supabaseClient)supabaseClient.auth.getSession().then(({data})=>{if(data.session)showDashboard(data.session.user)}).catch(err=>console.error('Falha ao recuperar sessão:',err));
 if(supabaseClient)supabaseClient.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'&&session&&!currentUser)showDashboard(session.user)});
 </script></body></html>
