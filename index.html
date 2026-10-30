@@ -438,7 +438,7 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 <div class="history-library"><div class="history-library-head"><div><span class="history-kicker">VISÃO DA BIBLIOTECA</span><h2>Suas criações</h2><p>Encontre e acompanhe seus projetos salvos.</p></div><span class="history-count" id="historyCountLabel">0 projetos</span></div><div class="history-toolbar"><label class="history-search"><span>⌕</span><input id="projectSearch" type="search" placeholder="Buscar projeto pelo nome..." aria-label="Buscar projeto pelo nome"></label><label class="history-filter"><span>Filtrar:</span><select id="projectStatusFilter" aria-label="Filtrar projetos"><option value="all">Todos os status</option><option value="pending">Em preparação</option><option value="processing">Processando</option><option value="completed">Concluídos</option><option value="failed">Com falha</option></select></label></div><div id="allProjects" class="history-project-grid"><div class="empty">Carregando seus projetos...</div></div></div>
 </section>
 <section id="tab-admin" class="hidden">
-<div class="panel" style="margin-bottom:16px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h2>Pagamentos e clientes</h2><p class="muted">Acompanhe pagamentos confirmados e pendentes do Mercado Pago.</p></div><button class="btn" type="button" id="refreshAdminPayments">Atualizar pagamentos</button></div><div id="adminPaymentsList" class="empty" style="margin-top:14px">Carregando pagamentos...</div></div>
+<div class="panel" style="margin-bottom:16px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><h2>Pagamentos e clientes</h2><p class="muted">Acompanhe pagamentos confirmados e pendentes do Mercado Pago.</p></div><button class="btn" type="button" id="refreshAdminPayments">Atualizar pagamentos</button></div><div id="adminSalesSummary" class="stats" style="margin-top:18px"><div class="stat"><small>Total vendido</small><strong id="salesTotal">R$ 0,00</strong></div><div class="stat"><small>Vendido hoje</small><strong id="salesToday">R$ 0,00</strong></div><div class="stat"><small>Vendido neste mês</small><strong id="salesMonth">R$ 0,00</strong></div><div class="stat"><small>Vendas aprovadas</small><strong id="salesCount">0</strong></div></div><p class="muted" style="font-size:12px">Somente pagamentos aprovados pelo Mercado Pago entram nesses valores. Atualize para consultar novamente.</p><div id="adminPaymentsList" class="empty" style="margin-top:14px">Carregando pagamentos...</div></div>
 <div class="dash-title"><div><span class="tag">ADMINISTRAÇÃO</span><h1>Vídeos da página inicial</h1><p class="muted">Envie, substitua ou remova o vídeo do banner e da galeria.</p></div></div>
 <div class="panel" style="margin-bottom:16px">
 <h2>Conexão com a IA</h2>
@@ -519,6 +519,26 @@ async function renderAdminMedia(){if(!isPeviaAdmin||!supabaseClient)return;const
 async function renderAdminPayments(){
  if(!isPeviaAdmin||!supabaseClient)return;
  const box=$('#adminPaymentsList');if(!box)return;box.textContent='Carregando pagamentos...';
+ const money=value=>'R$ '+Number(value||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+ try{
+  let approved=[],offset=0,pageSize=1000;
+  while(true){
+   const {data,error}=await supabaseClient.from('payments').select('amount,paid_at').eq('status','approved').not('paid_at','is',null).order('paid_at',{ascending:false}).range(offset,offset+pageSize-1);
+   if(error)throw error;
+   approved=approved.concat(data||[]);
+   if(!data||data.length<pageSize)break;
+   offset+=pageSize;
+  }
+  const now=new Date(),todayKey=now.toLocaleDateString('en-CA'),monthKey=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const total=approved.reduce((sum,p)=>sum+Number(p.amount||0),0);
+  const today=approved.filter(p=>new Date(p.paid_at).toLocaleDateString('en-CA')===todayKey).reduce((sum,p)=>sum+Number(p.amount||0),0);
+  const month=approved.filter(p=>{const d=new Date(p.paid_at);return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()}).reduce((sum,p)=>sum+Number(p.amount||0),0);
+  $('#salesTotal').textContent=money(total);$('#salesToday').textContent=money(today);$('#salesMonth').textContent=money(month);$('#salesCount').textContent=String(approved.length);
+ }catch(error){
+  console.error('Falha ao calcular vendas:',error);
+  ['salesTotal','salesToday','salesMonth','salesCount'].forEach(id=>{const el=$('#'+id);if(el)el.textContent='—'});
+  box.textContent='Não foi possível calcular o total vendido: '+error.message;return;
+ }
  const {data,error}=await supabaseClient.from('payments').select('id,user_id,amount,currency,status,plan_code,created_at,paid_at,expires_at,metadata,provider_payment_id').order('created_at',{ascending:false}).limit(100);
  if(error){box.textContent='Não foi possível carregar os pagamentos: '+error.message;return}
  if(!data?.length){box.textContent='Nenhum pagamento registrado ainda.';return}
