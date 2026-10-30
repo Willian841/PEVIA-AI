@@ -116,6 +116,17 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
  .pv-wizard-panel[data-step="4"] .pv-full-outfit-catalog>.pv-clothes-grid .pv-clothes img{height:76px}
  .pv-wizard-panel[data-step="5"] .pv-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* Wizard: altura natural, painéis ligados ao número da etapa */
+.pv-wizard-card{height:auto!important;min-height:0!important;align-self:start}
+.pv-wizard-panel{min-height:0!important;height:auto!important}
+.pv-wizard-panel[hidden]{display:none!important}
+.pv-wizard-panel.active:not([hidden]){display:block!important;visibility:visible!important;opacity:1!important}
+.pv-wizard-panel[data-step="4"]>.pv-option-grid{margin-top:10px!important}
+.pv-wizard-panel[data-step="4"]>h2{margin-top:7px!important}
+.pv-wizard-panel[data-step="5"],.pv-wizard-panel[data-step="6"]{color:#f4f1ff!important}
+.pv-wizard-panel[data-step="5"] .pv-config-section,.pv-wizard-panel[data-step="6"] .pv-review-summary,.pv-wizard-panel[data-step="6"] .pv-review-list,.pv-wizard-panel[data-step="6"] .pv-format-section,.pv-wizard-panel[data-step="6"] .pv-generate-info{display:block!important;visibility:visible!important;opacity:1!important}
+.pv-wizard-panel[data-step="6"] .pv-review-list{display:grid!important}
 </style>
 </head>
 <body>
@@ -390,12 +401,57 @@ function renderHistoryProjects(){const box=$('#allProjects');if(!box)return;cons
 async function renderProjects(){if(!supabaseClient){$('#recentProjects').textContent='Conexão com o banco de dados indisponível. Atualize a página e tente novamente.';return}const {data,error}=await supabaseClient.from('projects').select('id,name,aspect_ratio,status,created_at').order('created_at',{ascending:false});if(error){console.error(error);$('#recentProjects').textContent='Não foi possível carregar os projetos: '+error.message;return}projects=data||[];const pending=projects.filter(p=>p.status==='pending'||p.status==='processing').length;const completed=projects.filter(p=>p.status==='completed').length;$('#totalProjects').textContent=projects.length;$('#pendingProjects').textContent=pending;$('#historyTotal').textContent=projects.length;$('#historyPending').textContent=pending;$('#historyCompleted').textContent=completed;$('#recentProjects').innerHTML=projects.length?projects.slice(0,4).map(renderProjectRow).join(''):'<div class="empty">Você ainda não criou projetos. Clique em “Novo projeto” para começar.</div>';renderHistoryProjects()}
 $('#projectSearch')?.addEventListener('input',renderHistoryProjects);$('#projectStatusFilter')?.addEventListener('change',renderHistoryProjects);
 let pvStep=0;
-const pvPanels=[...document.querySelectorAll('.pv-wizard-panel')];
-function pvSelected(name){return document.querySelector('input[name="'+name+'"]:checked')?.value||''}function pvSelectedAll(name){return [...document.querySelectorAll('input[name="'+name+'"]:checked')].map(x=>x.value)}
-function pvUpdate(){pvPanels.forEach((p,i)=>{const active=i===pvStep;p.classList.toggle('active',active);p.style.display=active?'block':'none';p.setAttribute('aria-hidden',active?'false':'true')});document.querySelectorAll('.pv-step').forEach((p,i)=>{p.classList.toggle('active',i===pvStep);p.classList.toggle('done',i<pvStep);p.setAttribute('aria-current',i===pvStep?'step':'false')});$('#pvBack').disabled=pvStep===0;$('#pvNext').classList.toggle('hidden',pvStep===6);$('#pvGenerate').classList.toggle('hidden',pvStep!==6);$('#pvStepLabel').textContent='Etapa '+(pvStep+1)+' de 7';if(pvStep===6){try{pvReview()}catch(err){console.error('Falha ao montar revisão:',err);const box=$('#pvReviewList');if(box)box.innerHTML='<p class="studio-help">Não foi possível montar o resumo. Volte uma etapa e tente novamente.</p>'}}}
-function pvReview(){const video=$('#sourceVideo').files[0];const avatarParts=['avatarHair','avatarFace','avatarBody','avatarBeard'].map(n=>pvSelected(n)).filter(Boolean).join(', ');const chars=pvSelectedAll('character').join(', ')||(avatarParts?'Avatar personalizado · '+avatarParts:($('#avatarDescription').value.trim()?'Avatar personalizado':'Foto enviada'));const details=[...document.querySelectorAll('input[name="detail"]:checked')].map(x=>x.value);const outfit=pvSelected('outfitMode');const clothes=[pvSelected('clothingStyle'),pvSelected('setChoice'),$('#topChoice')?.value,$('#bottomChoice')?.value,$('#outfitColor')?.value,pvSelected('jerseyTeamChoice')?'Camisa '+pvSelected('jerseyTeamChoice'):'',pvSelected('teamShort')?'Short '+pvSelected('teamShort'):''].filter(Boolean).join(' · ');const groups=[{title:'Arquivos e origem',step:1,rows:[['Vídeo original',video?.name||'Não selecionado'],['Imagem/vídeo de referência',$('#replaceReference')?.files[0]?.name||'Não enviado']]},{title:'Transformação',step:0,rows:[['Tipo',pvSelected('targetType')],['Pessoas a substituir',pvSelected('replaceCount')+' pessoa(s)']]},{title:'Personagem',step:3,rows:[['Personagem(ns)',chars],['Descrição do avatar',$('#avatarDescription')?.value.trim()||'Não informada']]},{title:'Visual e roupas',step:4,rows:[['Modo de roupa',outfit],['Peças e uniforme',clothes||'Sem personalização adicional'],['Camisa do avatar',pvSelected('avatarTop')||'Não selecionada'],['Calça/short do avatar',pvSelected('avatarBottom')||'Não selecionado'],['Calçado',pvSelected('avatarFootwear')||'Não selecionado'],['Nome e número',($('#jerseyName')?.value.trim()||'—')+' · '+($('#jerseyNumber')?.value||'—')]]},{title:'Detalhes finais',step:5,rows:[['Acessórios e acabamentos',details.join(', ')||'Nenhum selecionado'],['Instruções adicionais',$('#detailText').value.trim()||'Nenhuma']]},{title:'Orientações gerais',step:0,rows:[['Nome do projeto',$('#projectName').value.trim()||'Sem nome'],['Orientação geral',$('#prompt').value.trim()||'Nenhuma']]}];$('#pvReviewList').innerHTML=groups.map(g=>'<section class="pv-review-group"><header><strong>'+escapeHtml(g.title)+'</strong><button type="button" class="pv-review-edit" data-review-step="'+g.step+'">Editar</button></header>'+g.rows.map(([k,v])=>'<div class="pv-review-row"><span>'+escapeHtml(k)+'</span><strong>'+escapeHtml(v)+'</strong></div>').join('')+'</section>').join('');$('#pvReviewList').querySelectorAll('[data-review-step]').forEach(btn=>btn.addEventListener('click',()=>{pvStep=Number(btn.dataset.reviewStep);pvUpdate();document.querySelector('.pv-wizard-card').scrollIntoView({behavior:'smooth',block:'start'})}));}
-$('#pvNext').addEventListener('click',()=>{if(pvStep===6)return;if(pvStep===5)pvReview();pvStep=Math.min(6,pvStep+1);pvUpdate()});document.querySelectorAll('.pv-step[data-pv-step]').forEach(step=>step.addEventListener('click',()=>{pvStep=Number(step.dataset.pvStep);if(pvStep===6)pvReview();pvUpdate()}));
-$('#pvBack').addEventListener('click',()=>{pvStep=Math.max(0,pvStep-1);pvUpdate()});
+const pvPanels=[...document.querySelectorAll('.pv-wizard-panel[data-step]')];
+function pvSelected(name){return document.querySelector('input[name="'+name+'"]:checked')?.value||''}
+function pvSelectedAll(name){return [...document.querySelectorAll('input[name="'+name+'"]:checked')].map(x=>x.value)}
+function pvGoToStep(next){
+ const target=Math.max(0,Math.min(6,Number(next)||0));
+ pvStep=target;
+ pvPanels.forEach(panel=>{
+  const active=Number(panel.dataset.step)===target;
+  panel.classList.toggle('active',active);
+  panel.hidden=!active;
+  panel.style.setProperty('display',active?'block':'none','important');
+  panel.setAttribute('aria-hidden',active?'false':'true');
+ });
+ document.querySelectorAll('.pv-step[data-pv-step]').forEach(step=>{
+  const n=Number(step.dataset.pvStep);
+  step.classList.toggle('active',n===target);
+  step.classList.toggle('done',n<target);
+  step.setAttribute('aria-current',n===target?'step':'false');
+ });
+ $('#pvBack').disabled=target===0;
+ $('#pvNext').classList.toggle('hidden',target===6);
+ $('#pvGenerate').classList.toggle('hidden',target!==6);
+ $('#pvStepLabel').textContent='Etapa '+(target+1)+' de 7';
+ if(target===6)pvReview();
+}
+function pvUpdate(){pvGoToStep(pvStep)}
+function pvReview(){
+ const value=id=>document.getElementById(id)?.value?.trim()||'';
+ const file=id=>document.getElementById(id)?.files?.[0]?.name||'Não selecionado';
+ const video=file('sourceVideo');
+ const avatarParts=['avatarHair','avatarFace','avatarBody','avatarBeard'].map(n=>pvSelected(n)).filter(Boolean).join(', ');
+ const chars=pvSelectedAll('character').join(', ')||(avatarParts?'Avatar personalizado · '+avatarParts:(value('avatarDescription')?'Avatar personalizado':'Foto enviada'));
+ const details=[...document.querySelectorAll('input[name="detail"]:checked')].map(x=>x.value);
+ const outfit=pvSelected('outfitMode');
+ const clothes=[pvSelected('clothingStyle'),pvSelected('setChoice'),value('topChoice'),value('bottomChoice'),value('outfitColor'),pvSelected('jerseyTeamChoice')?'Camisa '+pvSelected('jerseyTeamChoice'):'',pvSelected('teamShort')?'Short '+pvSelected('teamShort'):''].filter(Boolean).join(' · ');
+ const groups=[
+  {title:'Arquivos e origem',step:1,rows:[['Vídeo original',video],['Imagem/vídeo de referência',file('replaceReference')]]},
+  {title:'Transformação',step:0,rows:[['Tipo',pvSelected('targetType')||'Não selecionado'],['Pessoas a substituir',(pvSelected('replaceCount')||'1')+' pessoa(s)']]},
+  {title:'Personagem',step:3,rows:[['Personagem(ns)',chars],['Descrição do avatar',value('avatarDescription')||'Não informada']]},
+  {title:'Visual e roupas',step:4,rows:[['Modo de roupa',outfit||'Não selecionado'],['Peças e uniforme',clothes||'Sem personalização adicional'],['Camisa do avatar',pvSelected('avatarTop')||'Não selecionada'],['Calça/short do avatar',pvSelected('avatarBottom')||'Não selecionado'],['Calçado',pvSelected('avatarFootwear')||'Não selecionado'],['Nome e número',(value('jerseyName')||'—')+' · '+(value('jerseyNumber')||'—')]]},
+  {title:'Detalhes finais',step:5,rows:[['Acessórios e acabamentos',details.join(', ')||'Nenhum selecionado'],['Instruções adicionais',value('detailText')||'Nenhuma']]},
+  {title:'Orientações gerais',step:0,rows:[['Nome do projeto',value('projectName')||'Sem nome'],['Orientação geral',value('prompt')||'Nenhuma']]}
+ ];
+ const box=$('#pvReviewList');
+ if(!box)throw new Error('A área de revisão não foi encontrada no formulário.');
+ box.innerHTML=groups.map(g=>'<section class="pv-review-group"><header><strong>'+escapeHtml(g.title)+'</strong><button type="button" class="pv-review-edit" data-review-step="'+g.step+'">Editar</button></header>'+g.rows.map(([k,v])=>'<div class="pv-review-row"><span>'+escapeHtml(k)+'</span><strong>'+escapeHtml(v)+'</strong></div>').join('')+'</section>').join('');
+ box.querySelectorAll('[data-review-step]').forEach(btn=>btn.addEventListener('click',()=>{pvGoToStep(btn.dataset.reviewStep);document.querySelector('.pv-wizard-card')?.scrollIntoView({behavior:'smooth',block:'start'})}));
+}
+$('#pvNext').addEventListener('click',()=>pvGoToStep(pvStep+1));
+document.querySelectorAll('.pv-step[data-pv-step]').forEach(step=>step.addEventListener('click',()=>pvGoToStep(step.dataset.pvStep)));
+$('#pvBack').addEventListener('click',()=>pvGoToStep(pvStep-1));
 document.querySelectorAll('input[name="targetType"]').forEach(x=>x.addEventListener('change',()=>{document.querySelectorAll('.pv-option').forEach(c=>c.classList.toggle('selected',c.querySelector('input')?.checked))}));
 document.querySelectorAll('input[name="replaceCount"]').forEach(x=>x.addEventListener('change',()=>{document.querySelectorAll('.pv-count-option').forEach(c=>c.classList.toggle('selected',c.querySelector('input')?.checked));const n=Number(pvSelected('replaceCount'));$('#pvPlanNote').textContent=n===1?'1 pessoa selecionada · Plano Básico':n+' pessoas selecionadas · Requer plano Premium';}));
 document.querySelectorAll('input[name="character"]').forEach(x=>x.addEventListener('change',()=>{const selected=pvSelectedAll('character');if(selected.length>5){x.checked=false;alert('Você pode selecionar no máximo 5 personagens.');}document.querySelectorAll('.pv-character').forEach(card=>card.classList.toggle('selected',card.querySelector('input')?.checked));const count=pvSelectedAll('character').length;$('#characterCountLabel').textContent=count+' personagem(ns) selecionado(s) · Básico: 1; Premium: até 5';}));;
