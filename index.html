@@ -734,7 +734,7 @@ function pvGoToStep(next){
   }
  }
 }
-function viralRefreshWizard(){const pet=pvSelected('targetType')==='Pet';const eyebrow=document.querySelector('.viral-type-panel>.pv-eyebrow');if(eyebrow)eyebrow.textContent=pet?'SUBSTITUIR PET':'SUBSTITUIR PESSOA';document.querySelectorAll('.viral-type-grid .pv-option').forEach(x=>x.classList.toggle('selected',!!x.querySelector('input:checked')));const put=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};put('viralSummaryType',pet?'Pet':'Pessoa');put('viralSummaryVideo',document.getElementById('sourceVideo')?.files?.[0]?.name||'Falta escolher');const n=pvSelected('replaceCount')||'1';put('viralSummaryCount',n+' '+(pet?'pet':Number(n)===1?'pessoa':'pessoas'));put('viralSummaryCharacter',document.getElementById('viralReplaceWho')?.value?.trim()||pvSelectedAll('character').join(', ')||'Falta escolher');put('viralSummaryOutfit',pvSelected('outfitMode')||'Roupa original');put('viralSummaryDetails',document.getElementById('prompt')?.value?.trim()||'Nenhum')};document.querySelectorAll('input[name="targetType"],input[name="replaceCount"],input[name="character"],input[name="outfitMode"],#sourceVideo,#prompt').forEach(el=>el.addEventListener('change',viralRefreshWizard));viralRefreshWizard();function pvUpdate(){pvGoToStep(pvStep);viralRefreshWizard()}
+function viralRefreshWizard(){const pet=pvSelected('targetType')==='Pet';const eyebrow=document.querySelector('.viral-type-panel>.pv-eyebrow');if(eyebrow)eyebrow.textContent=pet?'SUBSTITUIR PET':'SUBSTITUIR PESSOA';document.querySelectorAll('.viral-type-grid .pv-option').forEach(x=>x.classList.toggle('selected',!!x.querySelector('input:checked')));const put=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};put('viralSummaryType',pet?'Pet':'Pessoa');put('viralSummaryVideo',document.getElementById('sourceVideo')?.files?.[0]?.name||'Falta escolher');const n=pvSelected('replaceCount')||'1';put('viralSummaryCount',n+' '+(pet?'pet':Number(n)===1?'pessoa':'pessoas'));put('viralSummaryCharacter',document.getElementById('viralReplaceWho')?.value?.trim()||pvSelectedAll('character').join(', ')||'Falta escolher');put('viralSummaryOutfit',pvSelected('outfitMode')||'Roupa original');put('viralSummaryDetails',([...document.querySelectorAll('input[name="detail"]:checked')].map(x=>x.value).join(', ')||document.getElementById('detailText')?.value?.trim()||'Nenhum'))};document.querySelectorAll('input[name="targetType"],input[name="replaceCount"],input[name="character"],input[name="outfitMode"],#sourceVideo,#prompt').forEach(el=>el.addEventListener('change',viralRefreshWizard));viralRefreshWizard();function pvUpdate(){pvGoToStep(pvStep);viralRefreshWizard()}
 function pvReview(){
  const value=id=>document.getElementById(id)?.value?.trim()||'';
  const file=id=>document.getElementById(id)?.files?.[0]?.name||'Não selecionado';
@@ -838,8 +838,37 @@ function pvOpenResult(url){
 }
 $('#pvResultClose').addEventListener('click',()=>{$('#pvResultModal').classList.remove('open');$('#pvResultVideo').pause()});
 $('#pvResultModal').addEventListener('click',e=>{if(e.target.id==='pvResultModal'){$('#pvResultModal').classList.remove('open');$('#pvResultVideo').pause()}});
+// Validação antes de enviar arquivos ou iniciar cobranças na IA.
+function pvValidateReview(){
+ const video=document.getElementById('sourceVideo')?.files?.[0];
+ if(!video)return {step:1,message:'Escolha um vídeo original antes de gerar.'};
+ const count=Number(pvSelected('replaceCount')||1);
+ if(count!==1)return {step:2,message:'A geração atual suporta substituir somente uma pessoa por vídeo.'};
+ const characters=pvSelectedAll('character');
+ const ownPhoto=document.getElementById('customCharacter')?.files?.[0];
+ if(characters.length>1)return {step:3,message:'Escolha apenas um personagem para esta geração.'};
+ if(!characters.length&&!ownPhoto)return {step:3,message:'Selecione um personagem ou envie uma foto de referência.'};
+ const outfit=pvSelected('outfitMode');
+ if(outfit==='Escolher roupa do catálogo'&&!pvSelected('jerseyTeamChoice')&&!pvSelected('clothingStyle'))return {step:4,message:'Escolha uma camisa ou roupa básica.'};
+ if(outfit==='Enviar minha roupa'&&!document.getElementById('customClothing')?.files?.[0])return {step:4,message:'Envie a imagem da roupa selecionada.'};
+ return null;
+}
+function pvShowReviewError(problem){
+ let box=document.getElementById('pvReviewValidation');
+ if(!box){box=document.createElement('p');box.id='pvReviewValidation';box.setAttribute('role','alert');const form=document.getElementById('projectForm');form?.querySelector('.pv-wizard-panel[data-step="6"]')?.prepend(box)}
+ if(box){box.textContent=problem?.message||'';box.hidden=!problem}
+}
+document.addEventListener('click',function(e){
+ const btn=e.target.closest('[data-review-step]');
+ if(!btn)return;
+ const step=Number(btn.dataset.reviewStep);
+ if(Number.isInteger(step)&&step>=0&&step<=6){e.preventDefault();pvGoToStep(step)}
+});
 $('#projectForm').addEventListener('submit',async e=>{
  e.preventDefault();
+ const reviewProblem=pvValidateReview();
+ if(reviewProblem){pvShowReviewError(reviewProblem);pvGoToStep(6);return}
+ pvShowReviewError(null);
  if(!currentUser){openModal('login');return}
  const button=$('#pvGenerate');let uncertainSubmission=false,projectId=null;
  button.disabled=true;button.textContent='Preparando vídeo...';
@@ -1248,4 +1277,4 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #tab-create .pv-wizard-panel[data-step="5"] .field{display:block!important}
 #tab-create .pv-wizard-panel[data-step="5"] textarea{display:block!important;width:100%!important;min-height:105px!important;background:#202226!important;color:white!important;border:1px solid #3c3f46!important;border-radius:14px!important;padding:14px!important}
 #tab-create .pv-wizard-panel[data-step="5"] #viralDetailCounter{display:block!important;text-align:right!important;color:#999!important;margin-top:5px!important}
-</style><script id="viral-details-counter">(function(){function start(){const t=document.getElementById('detailText'),c=document.getElementById('viralDetailCounter');if(t&&c){const update=()=>c.textContent=t.value.length+'/300';t.addEventListener('input',update);update()}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start()})();</script></body></html>
+</style><script id="viral-details-counter">(function(){function start(){const t=document.getElementById('detailText'),c=document.getElementById('viralDetailCounter');if(t&&c){const update=()=>c.textContent=t.value.length+'/300';t.addEventListener('input',update);update()}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start()})();</script><style id="viral-review-validation-style">#tab-create #pvReviewValidation{background:#302318!important;border:1px solid #e7ad3b!important;border-radius:12px!important;color:#ffda8b!important;padding:14px!important;margin:0 0 15px!important;font-weight:700!important}#tab-create #pvReviewValidation[hidden]{display:none!important}</style></body></html>
