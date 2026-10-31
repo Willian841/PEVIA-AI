@@ -1521,4 +1521,26 @@ async function sync(){const {data,error}=await sb.from('site_media').select('pla
 sync();document.addEventListener('visibilitychange',()=>{if(!document.hidden)landing.querySelectorAll('.viral-gallery video').forEach(v=>v.play().catch(()=>{}))});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()
+})();</script><style id="viral-promo-timer-css">
+.viral-promo-countdown{display:none;margin:15px auto 20px;padding:15px 20px;border:1px solid #c7ff0060;border-radius:15px;background:#c7ff0010;text-align:center;max-width:460px;color:#fff}
+.viral-promo-countdown strong{display:block;font-size:clamp(25px,4vw,36px);letter-spacing:2px;font-variant-numeric:tabular-nums;color:#c7ff00;margin-top:5px}
+.viral-promo-countdown small{color:#d0d0d0}
+#viralPromoAdmin{margin:16px 0;padding:20px;border:1px solid #41464c;border-radius:16px;background:#181b20}
+#viralPromoAdmin input{padding:12px;background:#101215;color:white;border:1px solid #555;border-radius:9px;max-width:100%}
+#viralPromoAdmin .viral-promo-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+</style><script id="viral-promo-timer-js">(function(){
+function init(){
+const sb=window.viralMediaSupabase,admin=document.getElementById('tab-admin'),plans=document.getElementById('pvAccessPlans'),publicPlans=document.getElementById('viralPricing');if(!sb||!admin||!plans)return;
+const markup='<div class="viral-promo-countdown"><small>⏳ PROMOÇÃO TERMINA EM</small><strong>00:00:00</strong></div>';
+plans.insertAdjacentHTML('afterbegin',markup);if(publicPlans)publicPlans.querySelector('.pv-promo')?.insertAdjacentHTML('afterbegin',markup);
+admin.insertAdjacentHTML('afterbegin','<div id="viralPromoAdmin"><h3>⏳ Contagem regressiva das promoções</h3><p class="muted">Escolha a data e o horário de término. O contador será igual para todos os visitantes, mesmo após atualizar a página.</p><div class="viral-promo-controls"><input id="viralPromoDeadline" type="datetime-local" aria-label="Data e horário final da promoção"><button type="button" class="btn primary" id="viralPromoSave">Iniciar / atualizar contagem</button><button type="button" class="btn" id="viralPromoStop">Desativar contagem</button></div><p id="viralPromoMessage" class="muted" aria-live="polite"></p></div>');
+let deadline=null;const widgets=[...document.querySelectorAll('.viral-promo-countdown')],input=document.getElementById('viralPromoDeadline'),message=document.getElementById('viralPromoMessage');
+function render(){const remaining=deadline?Math.max(0,deadline-Date.now()):0;for(const w of widgets){w.style.display=remaining>0?'block':'none';if(remaining>0){const sec=Math.floor(remaining/1000),days=Math.floor(sec/86400),hours=Math.floor(sec%86400/3600),minutes=Math.floor(sec%3600/60),seconds=sec%60;w.querySelector('strong').textContent=(days?days+'d ':'')+[hours,minutes,seconds].map(n=>String(n).padStart(2,'0')).join(':')}}}
+async function load(){const {data,error}=await sb.from('promotion_timer').select('ends_at').eq('id',1).maybeSingle();if(error){console.warn('Contagem promocional:',error);return}deadline=data?.ends_at?Date.parse(data.ends_at):null;render();if(deadline&&admin&&!admin.classList.contains('hidden')){const d=new Date(deadline);input.value=new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16)}}
+async function save(value){message.textContent='Salvando...';const {data:{user}}=await sb.auth.getUser();if(!user){message.textContent='Entre como administrador para alterar.';return}const {data:profile,error:profileError}=await sb.from('profiles').select('role').eq('id',user.id).maybeSingle();if(profileError||profile?.role!=='admin'){message.textContent='Apenas o administrador pode alterar a promoção.';return}const {error}=await sb.from('promotion_timer').update({ends_at:value,updated_at:new Date().toISOString()}).eq('id',1);if(error){message.textContent='Não foi possível salvar: '+error.message;return}deadline=value?Date.parse(value):null;render();message.textContent=value?'Contagem ativada para todos os visitantes.':'Contagem desativada.'}
+document.getElementById('viralPromoSave').addEventListener('click',()=>{const date=input.value?new Date(input.value):null;if(!date||!Number.isFinite(date.getTime())||date.getTime()<=Date.now()){message.textContent='Escolha uma data e horário futuros.';return}save(date.toISOString())});
+document.getElementById('viralPromoStop').addEventListener('click',()=>save(null));
+load();setInterval(render,1000);setInterval(load,60000);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();</script></body></html>
