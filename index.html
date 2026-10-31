@@ -1325,39 +1325,58 @@ document.getElementById('vgHide')?.addEventListener('click',()=>{document.getEle
 @media(max-width:1000px){#tab-create #pvAccessPlans .pv-access-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:650px){#tab-create #pvAccessPlans .pv-access-grid{grid-template-columns:1fr!important;max-width:440px!important}#tab-create #pvAccessPlans .pv-access-card{padding:20px 16px!important}#dashboard.active #tab-create:not(.hidden)>#pvAccessPlans{padding:16px 12px 95px!important}}
 </style><style id="viral-plan-scroll-structural-fix">
-/* Desacopla a página de preços do contêiner com overflow travado do painel. */
+/* Página independente, cobrindo o painel sem sobreposição. */
 html.viral-plans-open,html.viral-plans-open body{overflow:hidden!important}
-html.viral-plans-open #pvAccessPlans{
- position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;
- width:100%!important;height:100%!important;height:100dvh!important;
- overflow-y:scroll!important;overflow-x:hidden!important;
- overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;
- touch-action:pan-y!important;pointer-events:auto!important;
- z-index:2147483000!important;display:block!important;visibility:visible!important;
- padding-bottom:130px!important;box-sizing:border-box!important;
+html.viral-plans-open body>#pvAccessPlans{
+ position:fixed!important;inset:0!important;display:block!important;visibility:visible!important;
+ width:100vw!important;max-width:none!important;height:100vh!important;height:100dvh!important;
+ margin:0!important;overflow-y:auto!important;overflow-x:hidden!important;
+ padding:28px 22px 100px!important;box-sizing:border-box!important;
+ background:#101113!important;z-index:2147483000!important;
+ touch-action:pan-y!important;overscroll-behavior:contain!important;scrollbar-width:thin!important;
 }
-html.viral-plans-open #pvAccessPlans .pv-access-grid{align-items:start!important}
-html.viral-plans-open #pvAccessPlans .pv-access-card{height:auto!important;max-height:none!important;overflow:visible!important}
+html.viral-plans-open body>#pvAccessPlans .pv-access-heading{max-width:1050px!important;margin:0 auto 30px!important;text-align:center!important}
+html.viral-plans-open body>#pvAccessPlans .pv-access-grid{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ max-width:1200px!important;margin:0 auto!important;gap:18px!important;align-items:stretch!important
+}
+html.viral-plans-open body>#pvAccessPlans .pv-access-card{
+ display:flex!important;flex-direction:column!important;min-width:0!important;max-width:none!important;
+ width:auto!important;height:auto!important;max-height:none!important;overflow:visible!important;
+ padding:24px 20px!important;background:linear-gradient(145deg,#29331c,#191b1d 70%)!important;
+ border:1px solid #93b400!important;border-radius:20px!important
+}
+html.viral-plans-open body>#pvAccessPlans .pv-access-card h3{font-size:25px!important;color:white!important}
+html.viral-plans-open body>#pvAccessPlans .viral-offer-price{display:flex!important;flex-wrap:wrap!important;align-items:baseline!important;gap:12px!important;margin:18px 0!important}
+html.viral-plans-open body>#pvAccessPlans .viral-offer-price strong{font-size:clamp(31px,3.2vw,48px)!important;line-height:1.1!important;white-space:nowrap!important}
+html.viral-plans-open body>#pvAccessPlans .viral-offer-price del{font-size:18px!important;white-space:nowrap!important}
+html.viral-plans-open body>#pvAccessPlans .pv-access-card ul{flex:1!important;list-style:none!important;padding:10px 0!important}
+html.viral-plans-open body>#pvAccessPlans .pv-access-card li{font-size:14px!important;padding:11px 0!important}
+html.viral-plans-open body>#pvAccessPlans .pv-access-cta{width:auto!important;max-width:260px!important;min-height:40px!important;padding:10px 14px!important;margin:18px auto 0!important;font-size:13px!important}
+html.viral-plans-open body>#pvAccessPlans .viral-insta-proof{max-width:1200px!important;margin:35px auto!important;padding-bottom:100px!important}
+html.viral-plans-open body>#pvAccessPlans .viral-offer-disclaimer{max-width:1200px!important;margin:20px auto!important}
+@media(max-width:1050px){html.viral-plans-open body>#pvAccessPlans .pv-access-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:690px){html.viral-plans-open body>#pvAccessPlans .pv-access-grid{grid-template-columns:1fr!important;max-width:450px!important}html.viral-plans-open body>#pvAccessPlans{padding:16px 12px 100px!important}}
 </style>
 <script id="viral-plan-scroll-structural-js">
 (function(){
 const id='pvAccessPlans';
 function sync(){
- const page=document.getElementById('tab-create');
- const panel=document.getElementById(id);
- if(!page||!panel)return;
- const open=!!document.querySelector('#dashboard.active')&&!page.classList.contains('hidden');
+ const page=document.getElementById('tab-create'),panel=document.getElementById(id),dash=document.getElementById('dashboard');
+ if(!page||!panel||!dash)return;
+ const open=dash.classList.contains('active')&&!page.classList.contains('hidden');
  document.documentElement.classList.toggle('viral-plans-open',open);
- if(open){
-  if(panel.parentElement!==document.body)document.body.appendChild(panel);
-  panel.style.setProperty('overflow-y','scroll','important');
-  panel.style.setProperty('height','100dvh','important');
- }else{
-  if(panel.parentElement===document.body)page.insertBefore(panel,page.firstChild);
- }
+ if(open){if(panel.parentElement!==document.body)document.body.appendChild(panel);}
+ else if(panel.parentElement===document.body){page.insertBefore(panel,page.firstChild);}
 }
-const observer=new MutationObserver(sync);
-function init(){const page=document.getElementById('tab-create'),dash=document.getElementById('dashboard');if(!page||!dash)return;observer.observe(page,{attributes:true,attributeFilter:['class']});observer.observe(dash,{attributes:true,attributeFilter:['class']});sync();document.querySelectorAll('[data-tab="create"],[data-goto="create"]').forEach(el=>el.addEventListener('click',()=>requestAnimationFrame(sync)));}
+function init(){
+ const page=document.getElementById('tab-create'),dash=document.getElementById('dashboard');
+ if(!page||!dash)return;
+ const observer=new MutationObserver(sync);
+ observer.observe(page,{attributes:true,attributeFilter:['class']});
+ observer.observe(dash,{attributes:true,attributeFilter:['class']});
+ sync();
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script></body></html>
