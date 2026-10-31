@@ -1198,4 +1198,37 @@ badge.querySelector('small').textContent=selected.length>1?selected.length+' per
 function setup(){const screen=document.getElementById('pvPreviewScreen');if(!screen||document.getElementById('viralCharacterPreviewBadge'))return;const badge=document.createElement('div');badge.id='viralCharacterPreviewBadge';badge.hidden=true;badge.innerHTML='<img alt="Rosto do personagem escolhido"><span><strong></strong><small>Quem aparece</small></span>';screen.appendChild(badge);document.addEventListener('change',e=>{if(e.target.matches('input[name="character"],input[name="targetType"]'))updateAvatar()});document.addEventListener('input',e=>{if(e.target.id==='viralReplaceWho')updateAvatar()});document.addEventListener('click',e=>{if(e.target.closest('.pv-character'))queueMicrotask(updateAvatar)});updateAvatar()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
 })();
+</script><style id="viral-wizard-interaction-repair">
+#tab-create .pv-wizard-panel[data-step="4"] #jerseyGallery .pv-jersey-card,#tab-create .pv-wizard-panel[data-step="4"] .pv-clothes-grid .pv-clothes{cursor:pointer!important;position:relative!important;pointer-events:auto!important}
+#tab-create .pv-wizard-panel[data-step="4"] #jerseyGallery .pv-jersey-card:has(input:checked),#tab-create .pv-wizard-panel[data-step="4"] .pv-clothes-grid .pv-clothes:has(input:checked){outline:2px solid #c6ff00!important;background:#2b351b!important}
+#tab-create .pv-wizard-panel[data-step="4"] #jerseyGallery .pv-jersey-card input,#tab-create .pv-wizard-panel[data-step="4"] .pv-clothes-grid .pv-clothes input{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;opacity:0!important;cursor:pointer!important;z-index:4!important}
+#tab-create .pv-wizard-panel[data-step="5"].active{display:block!important;visibility:visible!important;opacity:1!important;min-height:360px!important}
+#tab-create .pv-wizard-panel[data-step="5"]>*{visibility:visible!important;opacity:1!important}
+</style><script id="viral-wizard-interaction-repair-script">
+(function(){
+function refreshAvatar(){
+ const badge=document.getElementById('viralCharacterPreviewBadge'),screen=document.getElementById('pvPreviewScreen');if(!screen)return;
+ let el=badge;if(!el){el=document.createElement('div');el.id='viralCharacterPreviewBadge';el.innerHTML='<img alt="Foto do personagem"><span><strong></strong><small>Quem aparece</small></span>';screen.appendChild(el)}
+ const selected=[...document.querySelectorAll('input[name="character"]:checked')];const chosen=selected[0]?.closest('label');const photo=chosen?.querySelector('img');const name=chosen?.querySelector('strong')?.textContent?.trim()||selected[0]?.value?.split(' (')[0]||'';
+ el.hidden=!name;if(!name)return;el.querySelector('strong').textContent=name;const img=el.querySelector('img');if(photo?.src){img.src=photo.src;img.hidden=false}else img.hidden=true;
+}
+function syncClothing(e){
+ const input=e.target;if(!input.matches('input[name="jerseyTeamChoice"],input[name="clothingStyle"]'))return;
+ const mode=document.querySelector('input[name="outfitMode"][value="Escolher roupa do catálogo"]');if(mode){mode.checked=true;mode.dispatchEvent(new Event('change',{bubbles:false}))}
+ const isTeam=input.name==='jerseyTeamChoice';document.querySelectorAll('input[name="'+(isTeam?'clothingStyle':'jerseyTeamChoice')+'"]').forEach(other=>other.checked=false);
+ document.querySelectorAll('#jerseyGallery .pv-jersey-card,.pv-clothes-grid .pv-clothes').forEach(label=>label.classList.toggle('selected',!!label.querySelector('input:checked')));
+ const summary=document.getElementById('viralSummaryOutfit');if(summary)summary.textContent=isTeam?'Camisa '+input.value:input.value;
+}
+function repairDetails(){
+ const panel=document.querySelector('#tab-create .pv-wizard-panel[data-step="5"]');if(!panel)return;
+ const active=document.querySelector('#tab-create .pv-step.active[data-pv-step="5"]');if(!active)return;
+ panel.hidden=false;panel.classList.add('active');panel.style.setProperty('display','block','important');panel.style.setProperty('visibility','visible','important');
+}
+function setup(){
+ document.addEventListener('change',e=>{syncClothing(e);if(e.target.matches('input[name="character"]'))refreshAvatar()},true);
+ document.addEventListener('click',e=>{if(e.target.closest('[data-pv-step="5"],#pvNext,#pvBack'))setTimeout(repairDetails,0)},true);
+ refreshAvatar();repairDetails();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
+})();
 </script></body></html>
