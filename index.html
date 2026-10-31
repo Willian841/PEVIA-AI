@@ -983,6 +983,7 @@ $('#projectForm').addEventListener('submit',async e=>{
   }
   if(!startData?.accepted)throw new Error(startData?.error||'A IA não aceitou o vídeo.');
   uncertainSubmission=true;
+  viralShowGeneration();
   button.textContent='IA editando seu vídeo...';
   $('#pvResultMessage').textContent='A IA está editando seu vídeo. Isso pode levar alguns minutos. Não feche esta página.';
   for(let attempt=0;attempt<90;attempt++){
@@ -994,16 +995,19 @@ $('#projectForm').addEventListener('submit',async e=>{
    }
    if(statusData.status==='completed'&&statusData.videoUrl){
     uncertainSubmission=false;
+    viralCloseGeneration();
     pvOpenResult(statusData.videoUrl);
     await renderProjects();
     button.textContent='Gerar vídeo ✦';
     return;
    }
    if(statusData.status==='failed')throw new Error(statusData.error||'A IA não conseguiu concluir o vídeo.');
+   viralUpdateGeneration('Processando seu vídeo com inteligência artificial…');
    button.textContent='IA editando... '+Math.min(99,Math.round((attempt+1)/90*100))+'%';
   }
   throw new Error('A geração continua em andamento. Não envie novamente. Atualize a página mais tarde e consulte o histórico do provedor antes de iniciar outra tarefa.');
  }catch(err){
+  viralCloseGeneration();
   console.error('Falha na geração do ViralIA:',err);
   if(projectId&&!uncertainSubmission){
    await supabaseClient.from('projects').update({status:'failed',generation_error:err.message||'Falha na preparação'}).eq('id',projectId);
@@ -1298,4 +1302,12 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #tab-create .viral-review-submit{display:block;width:100%;margin-top:20px;padding:19px;background:#c6ff00;color:#111;font-weight:900;font-size:19px;border:0;border-radius:15px;cursor:pointer}
 #tab-create .viral-review-time{text-align:center;color:#a5a5ad;font-weight:600;margin:14px 0 0}
 @media(max-width:700px){#tab-create .viral-review-panel #pvReviewList{grid-template-columns:1fr!important}#tab-create .viral-review-video{width:120px;height:205px}#tab-create .viral-review-row{grid-template-columns:92px minmax(0,1fr) 48px;gap:7px}}
-</style></body></html>
+</style><div id="viralGenerationOverlay" class="vg-overlay" role="dialog" aria-modal="true" aria-label="Geração do vídeo" hidden><div class="vg-dialog"><div class="vg-media"><video id="vgOriginal" muted autoplay loop playsinline></video><span class="vg-original-tag">VÍDEO ORIGINAL</span><div class="vg-scan"></div><div class="vg-avatar" id="vgAvatar">IA</div></div><div class="vg-content"><div class="vg-kicker">GERANDO SEU VÍDEO</div><h2>A IA ESTÁ CRIANDO SUA NOVA VERSÃO</h2><div class="vg-character"><div class="vg-face" id="vgFace">✦</div><div><small>Quem vai aparecer</small><strong id="vgName">Personagem selecionado</strong><small id="vgOutfit">Roupa original</small></div></div><div class="vg-steps"><div class="vg-done">● <span>Analisando o vídeo</span></div><div class="vg-current"><span class="vg-spinner"></span><span id="vgStage">Processando seu vídeo com inteligência artificial…</span></div><div>○ <span>Aplicando o novo personagem</span></div><div>○ <span>Ajustando roupa e detalhes</span></div><div>○ <span>Finalizando o vídeo</span></div></div><div class="vg-indeterminate"><span></span></div><p id="vgNote">O processamento pode levar alguns minutos. O andamento depende da resposta da IA.</p><small>Não feche esta página enquanto aguarda o resultado.</small><button type="button" id="vgHide">Ocultar janela (geração continua)</button></div></div></div><style id="viral-generation-screen-css">
+.vg-overlay[hidden]{display:none!important}.vg-overlay{position:fixed;inset:0;z-index:999999;background:#000c;display:flex;align-items:center;justify-content:center;padding:20px}.vg-dialog{width:min(100%,1006px);background:#191b1f;border:1px solid #3a3c42;border-radius:22px;padding:34px;display:grid;grid-template-columns:320px 1fr;gap:28px;color:#fff;box-shadow:0 25px 100px #000b}.vg-media{height:565px;position:relative;border-radius:20px;overflow:hidden;border:1px solid #b8ed32;background:#252729}.vg-media video{width:100%;height:100%;object-fit:cover}.vg-original-tag{position:absolute;top:14px;left:14px;background:#252525d9;color:white;padding:8px 12px;border-radius:10px;font-weight:900;font-size:12px}.vg-scan{position:absolute;left:0;right:0;top:60%;height:3px;background:#c6ff00;box-shadow:0 0 18px 5px #baff0080;animation:vgScan 4s ease-in-out infinite alternate}.vg-avatar{position:absolute;bottom:16px;right:14px;width:68px;height:68px;border:3px solid #c6ff00;border-radius:50%;background:#333;display:grid;place-items:center;font-weight:900;overflow:hidden}.vg-avatar img,.vg-face img{width:100%;height:100%;object-fit:cover}.vg-content{display:flex;flex-direction:column;justify-content:center;min-width:0}.vg-kicker{font-size:14px;font-weight:900;letter-spacing:1px;color:#c6ff00}.vg-content h2{font-size:30px;line-height:1.1;font-weight:950;margin:18px 0}.vg-character{display:flex;align-items:center;gap:15px;border:1px solid #34363c;background:#202227;border-radius:16px;padding:12px}.vg-face{height:58px;width:58px;flex-shrink:0;border-radius:13px;background:#333;overflow:hidden;display:grid;place-items:center}.vg-character small{display:block;color:#a3a5ad}.vg-character strong{display:block;font-size:18px}.vg-steps{display:grid;gap:16px;margin:26px 0;color:#8e9099}.vg-steps>div{display:flex;align-items:center;gap:13px}.vg-steps .vg-done{color:#c6ff00}.vg-steps .vg-current{color:#fff;font-weight:700}.vg-spinner{width:22px;height:22px;border:2px solid #c6ff00;border-right-color:transparent;border-radius:50%;animation:vgSpin 1s linear infinite}.vg-indeterminate{height:9px;background:#33363d;border-radius:20px;overflow:hidden}.vg-indeterminate span{display:block;width:35%;height:100%;border-radius:20px;background:#c6ff00;animation:vgSlide 2.4s ease-in-out infinite alternate}.vg-content p{color:#b0b1b9}.vg-content>small{color:#91939c}.vg-content>button{margin:20px auto 0;background:transparent;border:0;color:#c5b6e6;text-decoration:underline;cursor:pointer}.vg-overlay:not([hidden])~*{pointer-events:none}@keyframes vgScan{to{top:15%}}@keyframes vgSpin{to{transform:rotate(360deg)}}@keyframes vgSlide{to{transform:translateX(185%)}}@media(max-width:720px){.vg-dialog{grid-template-columns:1fr;padding:17px;gap:15px;max-height:94vh;overflow:auto}.vg-media{height:230px}.vg-content h2{font-size:23px;margin:9px 0}.vg-steps{gap:9px;margin:15px 0}}
+</style><script id="viral-generation-screen-js">
+let vgVideoObjectUrl=null;
+function viralShowGeneration(){const overlay=document.getElementById('viralGenerationOverlay');if(!overlay)return;const f=document.getElementById('sourceVideo')?.files?.[0];const v=document.getElementById('vgOriginal');if(vgVideoObjectUrl)URL.revokeObjectURL(vgVideoObjectUrl);if(f){vgVideoObjectUrl=URL.createObjectURL(f);v.src=vgVideoObjectUrl;v.play().catch(()=>{})}const name=document.getElementById('viralSummaryCharacter')?.textContent?.trim()||'Personagem selecionado';document.getElementById('vgName').textContent=name;document.getElementById('vgOutfit').textContent=document.getElementById('viralSummaryOutfit')?.textContent?.trim()||'Roupa original';const badge=document.querySelector('.viral-preview-character-avatar img, .viral-character-preview-avatar img');for(const id of ['vgAvatar','vgFace']){const node=document.getElementById(id);node.replaceChildren();if(badge?.src){const im=document.createElement('img');im.src=badge.src;node.appendChild(im)}else node.textContent='✦'}overlay.hidden=false}
+function viralUpdateGeneration(message){const node=document.getElementById('vgStage');if(node)node.textContent=message}
+function viralCloseGeneration(){const overlay=document.getElementById('viralGenerationOverlay');if(overlay)overlay.hidden=true;const v=document.getElementById('vgOriginal');if(v){v.pause();v.removeAttribute('src');v.load()}if(vgVideoObjectUrl){URL.revokeObjectURL(vgVideoObjectUrl);vgVideoObjectUrl=null}}
+document.getElementById('vgHide')?.addEventListener('click',()=>{document.getElementById('viralGenerationOverlay').hidden=true});
+</script></body></html>
