@@ -1173,4 +1173,29 @@ document.querySelectorAll('#pvReadyCharacters img[data-wiki-title]').forEach(loa
 #tab-create .pv-wizard-panel[data-step="4"] .pv-clothes-grid{grid-template-columns:repeat(4,minmax(0,116px))!important}
 #tab-create .pv-wizard-panel[data-step="4"] #pvOutfitUpload .pv-upload-large{display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;min-height:52px!important;border:1px dashed #393b42!important;background:transparent!important;border-radius:12px!important}
 #tab-create .pv-wizard-panel[data-step="4"] #pvOutfitUpload .pv-upload-large small{display:none!important}
-</style></body></html>
+</style><style id="viral-character-preview-avatar-style">
+#tab-create #pvPreviewScreen{position:relative!important}
+#tab-create #viralCharacterPreviewBadge{position:absolute!important;bottom:12px!important;left:12px!important;right:12px!important;z-index:12!important;display:flex;align-items:center;gap:9px;background:rgba(12,13,16,.82);border-radius:12px;padding:8px 10px;color:#fff;pointer-events:none;backdrop-filter:blur(5px)}
+#tab-create #viralCharacterPreviewBadge[hidden]{display:none!important}
+#tab-create #viralCharacterPreviewBadge img{width:37px;height:37px;object-fit:cover;border-radius:9px;flex-shrink:0}
+#tab-create #viralCharacterPreviewBadge strong{font-size:13px;display:block}
+#tab-create #viralCharacterPreviewBadge small{color:#b5b5bf;font-size:11px;display:block}
+</style><script id="viral-character-preview-avatar-script">
+(function(){
+function updateAvatar(){
+const badge=document.getElementById('viralCharacterPreviewBadge');if(!badge)return;
+const selected=Array.from(document.querySelectorAll('input[name="character"]:checked')).map(input=>input.closest('label')).filter(Boolean);
+const input=selected[0]?.querySelector('input[name="character"]');
+const photo=selected[0]?.querySelector('img.pv-character-photo, img');
+const title=selected[0]?.querySelector('strong');
+const name=title?.textContent?.trim()||input?.value?.split(' (')[0]||'';
+const custom=document.getElementById('viralReplaceWho')?.value?.trim();
+if(!name&&!custom){badge.hidden=true;return}
+badge.hidden=false;badge.querySelector('strong').textContent=name||custom;
+const image=badge.querySelector('img');if(photo?.src){image.src=photo.src;image.hidden=false}else{image.removeAttribute('src');image.hidden=true}
+badge.querySelector('small').textContent=selected.length>1?selected.length+' personagens escolhidos':'Quem aparece';
+}
+function setup(){const screen=document.getElementById('pvPreviewScreen');if(!screen||document.getElementById('viralCharacterPreviewBadge'))return;const badge=document.createElement('div');badge.id='viralCharacterPreviewBadge';badge.hidden=true;badge.innerHTML='<img alt="Rosto do personagem escolhido"><span><strong></strong><small>Quem aparece</small></span>';screen.appendChild(badge);document.addEventListener('change',e=>{if(e.target.matches('input[name="character"],input[name="targetType"]'))updateAvatar()});document.addEventListener('input',e=>{if(e.target.id==='viralReplaceWho')updateAvatar()});document.addEventListener('click',e=>{if(e.target.closest('.pv-character'))queueMicrotask(updateAvatar)});updateAvatar()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
+})();
+</script></body></html>
