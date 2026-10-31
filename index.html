@@ -1366,7 +1366,7 @@ const id='pvAccessPlans';
 function sync(){
  const page=document.getElementById('tab-create'),panel=document.getElementById(id),dash=document.getElementById('dashboard');
  if(!page||!panel||!dash)return;
- const open=dash.classList.contains('active')&&!page.classList.contains('hidden');
+ const open=dash.classList.contains('active')&&!page.classList.contains('hidden')&&!dash.classList.contains('viral-monetization-active');
  document.documentElement.classList.toggle('viral-plans-open',open);
  if(open){if(panel.parentElement!==document.body)document.body.appendChild(panel);}
  else if(panel.parentElement===document.body){page.insertBefore(panel,page.firstChild);}
@@ -1500,8 +1500,8 @@ async function load(){if(!sb)return;const {data}=await sb.from('site_media').sel
 setTimeout(load,1100);
 function sync(){edit.hidden=!allowed();if(!allowed())close()}
 new MutationObserver(sync).observe(admin,{attributes:true,attributeFilter:['class']});sync();
-document.querySelectorAll('#dashboard [data-studio-shortcut="monetization"]').forEach(b=>b.addEventListener('click',()=>requestAnimationFrame(()=>{dash.classList.remove('viral-download-active','viral-catalog-active');dash.classList.add('viral-monetization-active');main.scrollTop=0})));
-document.querySelectorAll('#dashboard [data-tab]:not([data-studio-shortcut="monetization"]),#dashboard [data-goto]').forEach(b=>b.addEventListener('click',()=>dash.classList.remove('viral-monetization-active')));
-section.querySelector('#viralMonetizationCTA').onclick=()=>{dash.classList.remove('viral-monetization-active');document.querySelector('#dashboard [data-tab="create"]')?.click()};
+document.querySelectorAll('#dashboard [data-studio-shortcut="monetization"]').forEach(b=>b.addEventListener('click',()=>requestAnimationFrame(()=>{dash.classList.remove('viral-download-active','viral-catalog-active');dash.classList.add('viral-monetization-active');document.documentElement.classList.remove('viral-plans-open');const plans=document.getElementById('pvAccessPlans');if(plans)plans.style.setProperty('display','none','important');main.scrollTop=0})));
+document.querySelectorAll('#dashboard [data-tab]:not([data-studio-shortcut="monetization"]),#dashboard [data-goto]').forEach(b=>b.addEventListener('click',()=>{dash.classList.remove('viral-monetization-active');document.getElementById('pvAccessPlans')?.style.removeProperty('display')}));
+section.querySelector('#viralMonetizationCTA').onclick=()=>{dash.classList.remove('viral-monetization-active');document.getElementById('pvAccessPlans')?.style.removeProperty('display');document.querySelector('#dashboard [data-tab="create"]')?.click()};
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()})();</script></body></html>
