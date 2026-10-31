@@ -1046,4 +1046,20 @@ document.querySelectorAll('a[href="#viralPricing"]').forEach(a=>a.addEventListen
 #tab-create .viral-avatar-grid img{height:75px!important;object-fit:cover!important}
 #tab-create .viral-avatar-layout{grid-template-columns:minmax(0,1fr) 175px!important}
 @media(max-width:900px){#tab-create .pv-wizard-layout{display:flex!important;flex-direction:column!important}#tab-create .pv-wizard-main,#tab-create .pv-preview-column{width:100%!important;max-width:none!important;position:static!important}#tab-create .viral-catalog-layout{grid-template-columns:minmax(0,1fr) 160px!important}#tab-create .viral-character-options{grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+</style><style id="viral-sticky-layout-repair">
+@media(min-width:761px){
+#dashboard .dash-layout{display:grid!important;grid-template-columns:205px minmax(0,1fr)!important;align-items:start!important;overflow:visible!important}
+#dashboard .viral-account-sidebar{display:flex!important;flex-direction:column!important;position:sticky!important;top:49px!important;height:calc(100dvh - 49px)!important;max-height:calc(100dvh - 49px)!important;overflow-y:auto!important;overflow-x:hidden!important;align-self:start!important;z-index:15!important;scrollbar-width:thin!important}
+#dashboard .dash-main{min-width:0!important;overflow:visible!important}
+#tab-create .pv-wizard-layout{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(255px,30%)!important;align-items:start!important;gap:14px!important}
+#tab-create .pv-wizard-main{grid-column:1!important;grid-row:1!important;width:auto!important;min-width:0!important;max-width:none!important}
+#tab-create .pv-preview-column{display:block!important;position:sticky!important;top:60px!important;grid-column:2!important;grid-row:1!important;order:0!important;width:auto!important;min-width:0!important;max-width:none!important;align-self:start!important}
+#tab-create .pv-preview-card{width:100%!important;max-width:none!important;box-sizing:border-box!important}
+#tab-create .pv-preview-screen{height:min(56vh,480px)!important;min-height:250px!important}
+}
+@media(max-width:760px){
+#dashboard .viral-account-sidebar{position:relative!important;max-height:none!important;overflow:visible!important}
+#tab-create .pv-wizard-layout{display:flex!important;flex-direction:column!important}
+#tab-create .pv-preview-column{position:static!important;width:100%!important;max-width:none!important}
+}
 </style></body></html>
