@@ -1062,4 +1062,48 @@ document.querySelectorAll('a[href="#viralPricing"]').forEach(a=>a.addEventListen
 #tab-create .pv-wizard-layout{display:flex!important;flex-direction:column!important}
 #tab-create .pv-preview-column{position:static!important;width:100%!important;max-width:none!important}
 }
-</style></body></html>
+</style><script id="viral-preview-hard-fix">
+(function(){
+function fix(){
+ const page=document.getElementById('tab-create'), layout=page?.querySelector('.pv-wizard-layout'),main=page?.querySelector('.pv-wizard-main'),preview=page?.querySelector('.pv-preview-column');
+ if(!page||!layout||!main||!preview)return;
+ // Garante que as duas colunas sejam irmãs, independentemente de HTML antigo.
+ if(main.parentElement!==layout)layout.prepend(main);
+ if(preview.parentElement!==layout)layout.appendChild(preview);
+ const desktop=window.innerWidth>=850;
+ if(desktop){
+  page.style.setProperty('max-width','none','important');
+  page.style.setProperty('width','100%','important');
+  layout.style.setProperty('display','grid','important');
+  layout.style.setProperty('grid-template-columns','minmax(0,1fr) 300px','important');
+  layout.style.setProperty('gap','14px','important');
+  layout.style.setProperty('align-items','start','important');
+  main.style.setProperty('grid-column','1','important');
+  main.style.setProperty('grid-row','1','important');
+  main.style.setProperty('min-width','0','important');
+  preview.style.setProperty('grid-column','2','important');
+  preview.style.setProperty('grid-row','1','important');
+  preview.style.setProperty('width','300px','important');
+  preview.style.setProperty('display','block','important');
+  preview.style.setProperty('position','sticky','important');
+  preview.style.setProperty('top','12px','important');
+  preview.style.setProperty('order','0','important');
+ }else{
+  layout.style.setProperty('display','flex','important');
+  layout.style.setProperty('flex-direction','column','important');
+  preview.style.setProperty('position','static','important');
+  preview.style.setProperty('width','100%','important');
+ }
+ const sidebar=document.querySelector('#dashboard .viral-account-sidebar');
+ if(sidebar&&desktop){
+  sidebar.style.setProperty('position','sticky','important');
+  sidebar.style.setProperty('top','49px','important');
+  sidebar.style.setProperty('height','calc(100vh - 49px)','important');
+  sidebar.style.setProperty('overflow-y','auto','important');
+ }
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',fix);else fix();
+window.addEventListener('resize',fix);
+document.querySelectorAll('[data-tab="create"],[data-goto="create"]').forEach(el=>el.addEventListener('click',()=>requestAnimationFrame(fix)));
+})();
+</script></body></html>
