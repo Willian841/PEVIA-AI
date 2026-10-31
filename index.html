@@ -1543,4 +1543,28 @@ document.getElementById('viralPromoStop').addEventListener('click',()=>save(null
 load();setInterval(render,1000);setInterval(load,60000);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();</script><style id="viral-credits-packs-css">
+#viralCreditPacks{max-width:1050px;margin:36px auto 80px;padding:26px 18px;border:1px solid #343a3d;border-radius:20px;background:#13161b;color:#fff}
+#viralCreditPacks h2{text-align:center;font-size:clamp(24px,4vw,33px);margin:0 0 10px}
+#viralCreditPacks .vc-subtitle{text-align:center;color:#b9c0c1;line-height:1.7;margin-bottom:24px}
+#viralCreditPacks .vc-pack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:14px}
+#viralCreditPacks .vc-pack{border:1px solid #424a49;background:#1c2025;border-radius:16px;padding:20px 13px;text-align:center}
+#viralCreditPacks .vc-pack strong{display:block;font-size:24px;color:#c7ff00;margin:10px 0}
+#viralCreditPacks .vc-pack b{display:block;font-size:27px;margin-bottom:12px}
+#viralCreditPacks .vc-pack button{width:100%;padding:12px;border-radius:10px;background:#c7ff00;border:0;font-weight:800;color:#141914;cursor:pointer}
+#viralCreditPacks .vc-note{text-align:center;margin-top:17px;color:#b7c0ba;font-size:13px}
+#viralCreditPacks .vc-status{text-align:center;margin:12px 0;color:#ffe4a0}
+</style>
+<script id="viral-credits-packs-js">(function(){
+function init(){
+const plans=document.getElementById('pvAccessPlans'),dash=document.getElementById('dashboard');if(!plans||!dash)return;
+const packs=[[100,'35,40'],[125,'40,99'],[200,'59,00'],[250,'89,00'],[300,'115,99']];
+const section=document.createElement('section');section.id='viralCreditPacks';section.innerHTML='<h2>Créditos avulsos</h2><div class="vc-subtitle"><strong>Pagamento único · Os créditos avulsos não expiram.</strong><p>Sem planos, o avulso sai pelo valor do crédito do plano básico.</p></div><div class="vc-pack-grid">'+packs.map(([n,p])=>'<article class="vc-pack"><strong>'+n+' CRÉDITOS</strong><b>R$ '+p+'</b><button type="button" data-credit-pack="'+n+'">Comprar créditos</button></article>').join('')+'</div><p class="vc-note">Os créditos são adicionais ao seu plano e não substituem a assinatura.</p><p class="vc-status" aria-live="polite"></p>';
+plans.appendChild(section);
+section.querySelectorAll('[data-credit-pack]').forEach(btn=>btn.addEventListener('click',()=>{section.querySelector('.vc-status').textContent='A compra deste pacote ainda está sendo integrada ao pagamento. Nenhuma cobrança foi realizada.'}));
+const buy=document.querySelector('.viral-side-wallet-bottom [data-tab="create"]');
+if(buy)buy.addEventListener('click',()=>{requestAnimationFrame(()=>{dash.classList.remove('viral-download-active','viral-catalog-active','viral-monetization-active');document.getElementById('pvAccessPlans')?.style.removeProperty('display');document.documentElement.classList.add('viral-plans-open');setTimeout(()=>{plans.scrollTop=0;window.scrollTo(0,0)},0)})});
+window.viralOfferExtraCredits=function(){document.querySelector('.viral-side-wallet-bottom [data-tab="create"]')?.click();setTimeout(()=>section.scrollIntoView({behavior:'smooth',block:'start'}),250)};
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()
 })();</script></body></html>
