@@ -1324,4 +1324,40 @@ document.getElementById('vgHide')?.addEventListener('click',()=>{document.getEle
 #tab-create #pvAccessPlans .viral-insta-proof{padding-bottom:80px!important}
 @media(max-width:1000px){#tab-create #pvAccessPlans .pv-access-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:650px){#tab-create #pvAccessPlans .pv-access-grid{grid-template-columns:1fr!important;max-width:440px!important}#tab-create #pvAccessPlans .pv-access-card{padding:20px 16px!important}#dashboard.active #tab-create:not(.hidden)>#pvAccessPlans{padding:16px 12px 95px!important}}
-</style></body></html>
+</style><style id="viral-plan-scroll-structural-fix">
+/* Desacopla a página de preços do contêiner com overflow travado do painel. */
+html.viral-plans-open,html.viral-plans-open body{overflow:hidden!important}
+html.viral-plans-open #pvAccessPlans{
+ position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;
+ width:100%!important;height:100%!important;height:100dvh!important;
+ overflow-y:scroll!important;overflow-x:hidden!important;
+ overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;
+ touch-action:pan-y!important;pointer-events:auto!important;
+ z-index:2147483000!important;display:block!important;visibility:visible!important;
+ padding-bottom:130px!important;box-sizing:border-box!important;
+}
+html.viral-plans-open #pvAccessPlans .pv-access-grid{align-items:start!important}
+html.viral-plans-open #pvAccessPlans .pv-access-card{height:auto!important;max-height:none!important;overflow:visible!important}
+</style>
+<script id="viral-plan-scroll-structural-js">
+(function(){
+const id='pvAccessPlans';
+function sync(){
+ const page=document.getElementById('tab-create');
+ const panel=document.getElementById(id);
+ if(!page||!panel)return;
+ const open=!!document.querySelector('#dashboard.active')&&!page.classList.contains('hidden');
+ document.documentElement.classList.toggle('viral-plans-open',open);
+ if(open){
+  if(panel.parentElement!==document.body)document.body.appendChild(panel);
+  panel.style.setProperty('overflow-y','scroll','important');
+  panel.style.setProperty('height','100dvh','important');
+ }else{
+  if(panel.parentElement===document.body)page.insertBefore(panel,page.firstChild);
+ }
+}
+const observer=new MutationObserver(sync);
+function init(){const page=document.getElementById('tab-create'),dash=document.getElementById('dashboard');if(!page||!dash)return;observer.observe(page,{attributes:true,attributeFilter:['class']});observer.observe(dash,{attributes:true,attributeFilter:['class']});sync();document.querySelectorAll('[data-tab="create"],[data-goto="create"]').forEach(el=>el.addEventListener('click',()=>requestAnimationFrame(sync)));}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script></body></html>
