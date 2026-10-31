@@ -1296,4 +1296,11 @@ function viralShowGeneration(){const overlay=document.getElementById('viralGener
 function viralUpdateGeneration(message){const node=document.getElementById('vgStage');if(node)node.textContent=message}
 function viralCloseGeneration(){const overlay=document.getElementById('viralGenerationOverlay');if(overlay)overlay.hidden=true;const v=document.getElementById('vgOriginal');if(v){v.pause();v.removeAttribute('src');v.load()}if(vgVideoObjectUrl){URL.revokeObjectURL(vgVideoObjectUrl);vgVideoObjectUrl=null}}
 document.getElementById('vgHide')?.addEventListener('click',()=>{document.getElementById('viralGenerationOverlay').hidden=true});
-</script></body></html>
+</script>
+<style id="viral-offer-visibility-fix-20261031">
+/* Última regra: outras folhas antigas escondiam os planos e exibiam o editor. */
+#dashboard.active #tab-create:not(.hidden) > #pvAccessPlans{display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;position:fixed!important;inset:0!important;z-index:99999!important;overflow-y:auto!important;height:100dvh!important;width:100vw!important;max-width:none!important;margin:0!important;}
+#dashboard.active #tab-create:not(.hidden) > .pv-wizard-layout{display:none!important;visibility:hidden!important;pointer-events:none!important}
+#dashboard.active #tab-create.hidden > #pvAccessPlans{display:none!important}
+</style>
+</body></html>
