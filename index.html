@@ -1119,15 +1119,26 @@ document.querySelectorAll('[data-tab="create"],[data-goto="create"]').forEach(el
 @media(max-width:900px){#tab-create .viral-character-mode .viral-mode-art{height:105px!important;min-height:105px!important}}
 </style><script id="viral-catalog-photo-loader">
 (function(){
-const cards=[...document.querySelectorAll('#pvReadyCharacters img[data-wiki-title]')];
-async function load(img){const title=img.dataset.wikiTitle;try{
-const api='https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages&piprop=thumbnail&pithumbsize=420&titles='+encodeURIComponent(title);
-const res=await fetch(api);if(!res.ok)throw Error('HTTP '+res.status);
-const json=await res.json(),page=Object.values(json.query?.pages||{})[0];
-if(page?.thumbnail?.source){img.src=page.thumbnail.source;img.classList.add('viral-photo-loaded');}
-else{img.alt='Foto indisponível: '+img.alt;img.classList.add('viral-photo-missing');}
-}catch(e){img.alt='Foto indisponível: '+img.alt;img.classList.add('viral-photo-missing');}}
-cards.forEach(load);
+const map={
+'Tio Phil':{url:'https://commons.wikimedia.org/wiki/Special:FilePath/James_Avery_no_cig.jpg?width=420',title:'James Avery'},
+'Claire Kyle':{title:'Jennifer Freeman',fallback:'https://image.tmdb.org/t/p/w342/7lKQeQ3u7LhbNnTYJdWqQJvRkGx.jpg'},
+'Junior Kyle':{title:'George O. Gore II'},
+'O Máskara':{title:'The Mask (1994 film)',fallback:'https://www.impawards.com/1994/posters/mask.jpg'},
+'Salsicha':{url:'https://commons.wikimedia.org/wiki/Special:FilePath/Shaggy_art_in_MultiVersus.png?width=420',title:'Shaggy Rogers'},
+'CJ':{title:'Carl Johnson (Grand Theft Auto)',fallback:'https://commons.wikimedia.org/wiki/Special:FilePath/Loading_Screen_(34183502236).jpg?width=420'}
+};
+async function wiki(title,lang){try{const r=await fetch('https://'+lang+'.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title));if(!r.ok)return '';const j=await r.json();return j.thumbnail?.source||j.originalimage?.source||''}catch(e){return ''}}
+async function load(img){
+const name=img.closest('label')?.querySelector('strong')?.textContent?.trim()||'';
+const conf=map[name]||{title:img.dataset.wikiTitle};
+const titles=[conf.title,img.dataset.wikiTitle].filter(Boolean);
+const sources=[conf.url];
+for(const title of titles){sources.push(await wiki(title,'en'));sources.push(await wiki(title,'pt'))}
+if(conf.fallback)sources.push(conf.fallback);
+let n=0;function next(){while(n<sources.length&&!sources[n])n++;if(n>=sources.length){img.classList.add('viral-photo-missing');img.alt='Imagem indisponível: '+name;return}img.src=sources[n++];}
+img.onload=()=>img.classList.add('viral-photo-loaded');img.onerror=next;next();
+}
+document.querySelectorAll('#pvReadyCharacters img[data-wiki-title]').forEach(load);
 })();
 </script><style id="viral-catalog-photo-style">
 #tab-create .viral-catalog-character img.viral-wiki-photo{display:block!important;width:100%!important;height:135px!important;object-fit:cover!important;background:linear-gradient(135deg,#24292b,#111416)!important;color:#b5b5b5;font-size:11px}
