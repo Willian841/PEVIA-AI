@@ -490,15 +490,12 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 </div>
 <div class="field"><label for="detailText">Algum detalhe extra?</label><textarea id="detailText" maxlength="300" rows="4" placeholder="Ex.: manter o rosto e o cabelo, adicionar um cordão prateado."></textarea><small id="viralDetailCounter">0/300</small></div>
 </div>
-<div class="pv-wizard-panel" data-step="6">
-    <span class="pv-eyebrow">ETAPA 07 · REVISÃO</span><h2>Resumo da sua criação</h2><p class="studio-help">Confira cada configuração. Use “Editar” para voltar diretamente à etapa correspondente.</p>
-    <div class="pv-review-summary"><span>✦</span><div><strong>Seu projeto está quase pronto</strong><p>Revise os arquivos, personagem, visual e acabamento antes de salvar.</p></div></div>
-    <div class="pv-review-list" id="pvReviewList"></div>
-    <section class="pv-config-section pv-format-section"><div class="pv-config-heading"><span>08</span><div><h3>Formato de saída</h3><p>Escolha onde pretende publicar seu vídeo.</p></div></div><div class="pv-format-options"><label><input id="format" type="radio" name="format" value="Vertical 9:16" checked><strong>9:16</strong><span>Vertical · Reels / TikTok</span></label><label><input type="radio" name="format" value="Horizontal 16:9"><strong>16:9</strong><span>Horizontal · YouTube</span></label><label><input type="radio" name="format" value="Quadrado 1:1"><strong>1:1</strong><span>Quadrado · Feed</span></label></div></section>
-    <div class="pv-generate-info"><span>⏱</span><div><strong>Geração de teste · P-Video Replace · 720p</strong><p>O modelo recebe o vídeo original, a referência do personagem e uma imagem da roupa escolhida. Limite atual: 20 segundos. O processamento preserva o movimento original; o resultado ainda depende da qualidade das referências.</p></div></div>
-    
-    
-   </div>
+<div class="pv-wizard-panel viral-review-panel" data-step="6">
+<h2>TUDO PRONTO?</h2><p class="studio-help">Confira suas escolhas. Toque em "Editar" para mudar qualquer item.</p>
+<div class="pv-review-list" id="pvReviewList"></div>
+<button type="submit" class="viral-review-submit" form="projectForm">GERAR MEU VÍDEO</button>
+<p class="viral-review-time">O processamento pode levar alguns minutos.</p>
+</div>
    </form>
   <div class="pv-wizard-controls viral-wizard-navigation"><button class="btn" type="button" id="pvBack" disabled>← Voltar</button><span id="pvStepLabel" class="viral-step-label">Etapa 1 de 7</span><button class="btn primary" type="button" id="pvNext">Continuar →</button></div>
  </div>
@@ -736,26 +733,30 @@ function pvGoToStep(next){
 }
 function viralRefreshWizard(){const pet=pvSelected('targetType')==='Pet';const eyebrow=document.querySelector('.viral-type-panel>.pv-eyebrow');if(eyebrow)eyebrow.textContent=pet?'SUBSTITUIR PET':'SUBSTITUIR PESSOA';document.querySelectorAll('.viral-type-grid .pv-option').forEach(x=>x.classList.toggle('selected',!!x.querySelector('input:checked')));const put=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};put('viralSummaryType',pet?'Pet':'Pessoa');put('viralSummaryVideo',document.getElementById('sourceVideo')?.files?.[0]?.name||'Falta escolher');const n=pvSelected('replaceCount')||'1';put('viralSummaryCount',n+' '+(pet?'pet':Number(n)===1?'pessoa':'pessoas'));put('viralSummaryCharacter',document.getElementById('viralReplaceWho')?.value?.trim()||pvSelectedAll('character').join(', ')||'Falta escolher');put('viralSummaryOutfit',pvSelected('outfitMode')||'Roupa original');put('viralSummaryDetails',([...document.querySelectorAll('input[name="detail"]:checked')].map(x=>x.value).join(', ')||document.getElementById('detailText')?.value?.trim()||'Nenhum'))};document.querySelectorAll('input[name="targetType"],input[name="replaceCount"],input[name="character"],input[name="outfitMode"],#sourceVideo,#prompt').forEach(el=>el.addEventListener('change',viralRefreshWizard));viralRefreshWizard();function pvUpdate(){pvGoToStep(pvStep);viralRefreshWizard()}
 function pvReview(){
- const value=id=>document.getElementById(id)?.value?.trim()||'';
- const file=id=>document.getElementById(id)?.files?.[0]?.name||'Não selecionado';
- const video=file('sourceVideo');
- const avatarParts=['avatarHair','avatarFace','avatarBody','avatarBeard'].map(n=>pvSelected(n)).filter(Boolean).join(', ');
- const chars=pvSelectedAll('character').join(', ')||(avatarParts?'Avatar personalizado · '+avatarParts:(value('avatarDescription')?'Avatar personalizado':'Foto enviada'));
+ const file=document.getElementById('sourceVideo')?.files?.[0];
+ const name=file?.name||'Nenhum vídeo selecionado';
+ const type=pvSelected('targetType')||'Pessoa';
+ const count=pvSelected('replaceCount')||'1';
+ const chars=pvSelectedAll('character');
+ const character=chars.join(', ')||(document.getElementById('customCharacter')?.files?.[0]?.name||'Não selecionado');
+ const outfit=pvSelected('outfitMode')||'Manter roupa original';
+ const clothing=pvSelected('jerseyTeamChoice')||pvSelected('clothingStyle');
+ const outfitName=outfit==='Escolher roupa do catálogo'?(clothing||'Roupa do catálogo'):outfit==='Enviar minha roupa'?'Roupa enviada':'Roupa original';
  const details=[...document.querySelectorAll('input[name="detail"]:checked')].map(x=>x.value);
- const outfit=pvSelected('outfitMode');
- const clothes=[pvSelected('clothingStyle'),pvSelected('setChoice'),value('topChoice'),value('bottomChoice'),value('outfitColor'),pvSelected('jerseyTeamChoice')?'Camisa '+pvSelected('jerseyTeamChoice'):'',pvSelected('teamShort')?'Short '+pvSelected('teamShort'):''].filter(Boolean).join(' · ');
- const groups=[
-  {title:'Arquivos e origem',step:1,rows:[['Vídeo original',video],['Imagem/vídeo de referência',file('replaceReference')]]},
-  {title:'Transformação',step:0,rows:[['Tipo',pvSelected('targetType')||'Não selecionado'],['Pessoas a substituir',(pvSelected('replaceCount')||'1')+' pessoa(s)']]},
-  {title:'Personagem',step:3,rows:[['Personagem(ns)',chars],['Referência de personagem',document.getElementById('customCharacter')?.files?.[0]?.name||'Galeria de personagens']]},
-  {title:'Visual e roupas',step:4,rows:[['Modo de roupa',outfit||'Não selecionado'],['Peças e uniforme',clothes||'Sem personalização adicional'],['Camisa do avatar',pvSelected('avatarTop')||'Não selecionada'],['Calça/short do avatar',pvSelected('avatarBottom')||'Não selecionado'],['Calçado',pvSelected('avatarFootwear')||'Não selecionado'],['Nome e número',(value('jerseyName')||'—')+' · '+(value('jerseyNumber')||'—')]]},
-  {title:'Detalhes finais',step:5,rows:[['Acessórios e acabamentos',details.join(', ')||'Nenhum selecionado'],['Instruções adicionais',value('detailText')||'Nenhuma']]},
-  {title:'Orientações gerais',step:0,rows:[['Nome do projeto',value('projectName')||'Sem nome'],['Orientação geral',value('prompt')||'Nenhuma']]}
+ const note=document.getElementById('detailText')?.value?.trim();
+ const rows=[
+ ['Vídeo',name,'Da sua galeria',1],
+ ['Tipo',type,'',0],
+ ['Substituição',count+' pessoa'+(count==='1'?'':'s'),'Pessoa 1',2],
+ ['Quem aparece',character,'',3],
+ ['Roupa',outfitName,'',4],
+ ['Detalhes',[...details,note].filter(Boolean).join(' · ')||'Nenhum','',5]
  ];
- const box=$('#pvReviewList');
- if(!box)throw new Error('A área de revisão não foi encontrada no formulário.');
- box.innerHTML=groups.map(g=>'<section class="pv-review-group"><header><strong>'+escapeHtml(g.title)+'</strong><button type="button" class="pv-review-edit" data-review-step="'+g.step+'">Editar</button></header>'+g.rows.map(([k,v])=>'<div class="pv-review-row"><span>'+escapeHtml(k)+'</span><strong>'+escapeHtml(v)+'</strong></div>').join('')+'</section>').join('');
- box.querySelectorAll('[data-review-step]').forEach(btn=>btn.addEventListener('click',()=>{pvGoToStep(btn.dataset.reviewStep);document.querySelector('.pv-wizard-card')?.scrollIntoView({behavior:'smooth',block:'start'})}));
+ const box=document.getElementById('pvReviewList');if(!box)return;
+ box.innerHTML='<div class="viral-review-video"><video id="viralReviewVideo" muted playsinline preload="metadata"></video></div><div class="viral-review-rows">'+rows.map(([label,value,sub,step])=>'<div class="viral-review-row"><span>'+escapeHtml(label)+'</span><div><strong>'+escapeHtml(value)+'</strong>'+(sub?'<small>'+escapeHtml(sub)+'</small>':'')+'</div><button type="button" data-review-step="'+step+'">Editar</button></div>').join('')+'</div>';
+ const preview=document.getElementById('pvVideoPreview'),thumb=document.getElementById('viralReviewVideo');
+ if(preview?.src&&thumb){thumb.src=preview.currentSrc||preview.src;thumb.currentTime=0.05}
+ box.querySelectorAll('[data-review-step]').forEach(btn=>btn.addEventListener('click',()=>pvGoToStep(Number(btn.dataset.reviewStep))));
 }
 $('#pvNext').addEventListener('click',()=>pvGoToStep(pvStep+1));
 $('#viralTypeContinue')?.addEventListener('click',()=>pvGoToStep(1));
@@ -1281,4 +1282,20 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #tab-create .pv-wizard-panel[data-step="0"] .viral-type-continue-row{display:none!important}
 #tab-create .pv-wizard-panel[data-step="1"] .viral-video-buttons #viralVideoNext{display:none!important}
 #tab-create .pv-wizard-panel[data-step="1"] .viral-video-buttons #viralVideoBack{display:none!important}
+</style><style id="viral-review-match-reference">
+#tab-create .pv-wizard-panel[data-step="6"].active{display:block!important;background:#181a1e!important;border:1px solid #2b2e33!important;border-radius:23px!important;padding:26px!important}
+#tab-create .viral-review-panel h2{color:#fff!important;font-size:36px!important;font-weight:900!important;margin:0 0 5px!important}
+#tab-create .viral-review-panel>.studio-help{color:#a4a5ad!important;margin-bottom:22px!important}
+#tab-create .viral-review-panel #pvReviewList{display:grid!important;grid-template-columns:188px minmax(0,1fr)!important;gap:20px!important;align-items:start!important}
+#tab-create .viral-review-video{width:188px;height:332px;border-radius:18px;overflow:hidden;background:#111}
+#tab-create .viral-review-video video{width:100%;height:100%;object-fit:cover}
+#tab-create .viral-review-rows{min-width:0}
+#tab-create .viral-review-row{display:grid;grid-template-columns:150px minmax(0,1fr) 58px;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid #303238;color:#a6a6ae}
+#tab-create .viral-review-row>div{min-width:0}
+#tab-create .viral-review-row strong{display:block;color:#fff;font-size:15px;overflow-wrap:anywhere}
+#tab-create .viral-review-row small{display:block;color:#8d8f99;font-size:12px;margin-top:3px}
+#tab-create .viral-review-row button{border:0!important;background:none!important;color:#c6ff00!important;text-decoration:underline;font-weight:800;cursor:pointer}
+#tab-create .viral-review-submit{display:block;width:100%;margin-top:20px;padding:19px;background:#c6ff00;color:#111;font-weight:900;font-size:19px;border:0;border-radius:15px;cursor:pointer}
+#tab-create .viral-review-time{text-align:center;color:#a5a5ad;font-weight:600;margin:14px 0 0}
+@media(max-width:700px){#tab-create .viral-review-panel #pvReviewList{grid-template-columns:1fr!important}#tab-create .viral-review-video{width:120px;height:205px}#tab-create .viral-review-row{grid-template-columns:92px minmax(0,1fr) 48px;gap:7px}}
 </style></body></html>
