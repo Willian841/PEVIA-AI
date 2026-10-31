@@ -290,6 +290,28 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 #tab-create .viral-video-selected-actions button:hover{border-color:#c7ff00}
 #tab-create .pv-preview-screen video:not(.hidden){width:100%!important;height:100%!important;object-fit:contain!important;border-radius:17px}
 @media(max-width:750px){#tab-create .viral-video-selected-card{flex-wrap:wrap}#tab-create .viral-video-selected-actions{width:100%}}
+
+#tab-create .viral-replace-panel{background:#181a1d!important;border:1px solid #2c3033!important;border-radius:22px!important;padding:24px!important}
+#tab-create .viral-replace-panel h2{font:900 clamp(24px,3vw,34px)/1.12 Arial,sans-serif!important;color:white!important;margin:0 0 8px!important}
+#tab-create .viral-replace-panel>.studio-help{color:#a4a6af!important;font-size:15px!important;margin:0 0 21px!important}
+#tab-create .viral-replace-label{display:block;color:#a8a9b1;font-size:13px;font-weight:900;letter-spacing:.6px;margin-bottom:9px}
+#tab-create .viral-count-grid{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:9px!important;margin-bottom:20px!important}
+#tab-create .viral-count-grid .viral-count-card{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important;min-width:0!important;min-height:95px!important;padding:8px 4px!important;background:#1d2024!important;border:2px solid #30343a!important;border-radius:15px!important;cursor:pointer!important;text-align:center!important}
+#tab-create .viral-count-grid .viral-count-card:has(input:checked){background:#2b3517!important;border-color:#c7ff00!important}
+#tab-create .viral-count-card input{position:absolute;opacity:0;pointer-events:none}
+#tab-create .viral-count-card strong{font:900 26px Arial,sans-serif!important;color:#eee!important}
+#tab-create .viral-count-unit{font-size:12px!important;color:#a4a6af!important}
+#tab-create .viral-count-card small{font-size:12px!important;font-weight:800!important;margin-top:3px}
+#tab-create .viral-free{color:#c7ff00!important}
+#tab-create .viral-premium{color:#ff3292!important}
+#tab-create .viral-replace-question{display:block;color:#fff;font-size:15px;font-weight:800;margin-bottom:8px}
+#tab-create #viralReplaceWho{display:block;width:100%;box-sizing:border-box;height:57px;padding:0 18px;border:1px solid #3a3e45;border-radius:15px;background:#1e2125;color:white;font-size:16px}
+#tab-create .viral-replace-examples{font-size:14px;color:#a3a5ad;margin:18px 0 0;line-height:1.5}
+#tab-create .viral-replace-nav{display:flex;justify-content:space-between;gap:12px;margin-top:26px}
+#tab-create .viral-replace-nav button{min-height:55px;padding:12px 27px;border-radius:13px;font-weight:800;cursor:pointer}
+#tab-create #viralReplaceBack{background:transparent;border:1px solid #35383e;color:white}
+#tab-create #viralReplaceNext{background:#c7ff00;border:0;color:#111;box-shadow:0 4px 0 #91bc00}
+@media(max-width:650px){#tab-create .viral-count-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}#tab-create .viral-replace-panel{padding:17px!important}}
 </style>
 </head>
 <body>
@@ -366,12 +388,8 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 <div class="pv-video-actions"><span id="videoFileName" class="upload-name">Nenhum vídeo selecionado</span><button class="btn" type="button" id="pvReplaceVideo">Trocar vídeo</button></div></div>
 <p class="viral-video-tip">Dica: escolha um vídeo com a pessoa bem visível e com boa luz. Não tem? <a href="https://www.instagram.com/reels/" target="_blank" rel="noopener noreferrer">Veja Reels no Instagram</a>.</p>
 <div class="viral-video-buttons"><button type="button" id="viralVideoBack">Voltar</button><button type="button" id="viralVideoNext">Continuar</button></div></div>
-<div class="pv-wizard-panel" data-step="2">
-    <span class="pv-eyebrow">ETAPA 03 · QUANTIDADE</span><h2>Quantas pessoas deseja substituir?</h2><p class="studio-help">O plano Básico inclui 1 pessoa. De 2 a 5 pessoas, é necessário o Premium.</p>
-    <div class="pv-count-grid"><label class="pv-count-option selected"><input type="radio" name="replaceCount" value="1" checked><strong>1</strong><span>Básico</span></label><label class="pv-count-option "><input type="radio" name="replaceCount" value="2" ><strong>2</strong><span>Premium</span></label><label class="pv-count-option "><input type="radio" name="replaceCount" value="3" ><strong>3</strong><span>Premium</span></label><label class="pv-count-option "><input type="radio" name="replaceCount" value="4" ><strong>4</strong><span>Premium</span></label><label class="pv-count-option "><input type="radio" name="replaceCount" value="5" ><strong>5</strong><span>Premium</span></label></div>
-    <p class="pv-plan-note" id="pvPlanNote">1 pessoa selecionada · Plano Básico</p>
-   </div>
-   <div class="pv-wizard-panel" data-step="3">
+<div class="pv-wizard-panel viral-replace-panel" data-step="2"><h2>QUEM VOCÊ QUER SUBSTITUIR?</h2><p class="studio-help">Descreva quem aparece no vídeo para a IA saber quem trocar.</p><label class="viral-replace-label">QUANTAS PESSOAS VOCÊ QUER SUBSTITUIR?</label><div class="pv-count-grid viral-count-grid"><label class="pv-count-option viral-count-card selected"><input type="radio" name="replaceCount" value="1" checked><strong>1</strong><span class="viral-count-unit">pessoa</span><small class="viral-free">Grátis</small></label><label class="pv-count-option viral-count-card "><input type="radio" name="replaceCount" value="2" ><strong>2</strong><span class="viral-count-unit">pessoas</span><small class="viral-premium">♙ Premium</small></label><label class="pv-count-option viral-count-card "><input type="radio" name="replaceCount" value="3" ><strong>3</strong><span class="viral-count-unit">pessoas</span><small class="viral-premium">♙ Premium</small></label><label class="pv-count-option viral-count-card "><input type="radio" name="replaceCount" value="4" ><strong>4</strong><span class="viral-count-unit">pessoas</span><small class="viral-premium">♙ Premium</small></label><label class="pv-count-option viral-count-card "><input type="radio" name="replaceCount" value="5" ><strong>5</strong><span class="viral-count-unit">pessoas</span><small class="viral-premium">♙ Premium</small></label><label class="pv-count-option viral-count-card "><input type="radio" name="replaceCount" value="6" ><strong>6</strong><span class="viral-count-unit">pessoas</span><small class="viral-premium">♙ Premium</small></label></div><label class="viral-replace-question" for="viralReplaceWho">Quem você quer substituir no vídeo?</label><input id="viralReplaceWho" type="text" maxlength="350" placeholder="Ex.: o menino de camisa preta e boné vermelho"><p class="viral-replace-examples">Outros exemplos: "o homem de branco à esquerda", "a pessoa que está dançando na frente".</p><p class="pv-plan-note" id="pvPlanNote" hidden>1 pessoa selecionada · Plano Básico</p><div class="viral-replace-nav"><button type="button" id="viralReplaceBack">Voltar</button><button type="button" id="viralReplaceNext">Continuar</button></div></div>
+<div class="pv-wizard-panel" data-step="3">
     <span class="pv-eyebrow">ETAPA 04 · PERSONAGEM</span><h2>Escolha quem vai aparecer</h2><p class="studio-help">Escolha um personagem da galeria ou envie uma foto de referência.</p>
     <div class="pv-character-modes"><button type="button" class="pv-mode active" data-char-mode="ready">Personagens prontos</button><button type="button" class="pv-mode" data-char-mode="photo">Enviar minha foto</button></div>
     <div id="pvReadyCharacters" class="pv-character-grid pv-expanded-character-grid">
@@ -671,7 +689,7 @@ function pvGoToStep(next){
   }
  }
 }
-function viralRefreshWizard(){const pet=pvSelected('targetType')==='Pet';const eyebrow=document.querySelector('.viral-type-panel>.pv-eyebrow');if(eyebrow)eyebrow.textContent=pet?'SUBSTITUIR PET':'SUBSTITUIR PESSOA';document.querySelectorAll('.viral-type-grid .pv-option').forEach(x=>x.classList.toggle('selected',!!x.querySelector('input:checked')));const put=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};put('viralSummaryType',pet?'Pet':'Pessoa');put('viralSummaryVideo',document.getElementById('sourceVideo')?.files?.[0]?.name||'Falta escolher');const n=pvSelected('replaceCount')||'1';put('viralSummaryCount',n+' '+(pet?'pet':Number(n)===1?'pessoa':'pessoas'));put('viralSummaryCharacter',pvSelectedAll('character').join(', ')||'Falta escolher');put('viralSummaryOutfit',pvSelected('outfitMode')||'Roupa original');put('viralSummaryDetails',document.getElementById('prompt')?.value?.trim()||'Nenhum')};document.querySelectorAll('input[name="targetType"],input[name="replaceCount"],input[name="character"],input[name="outfitMode"],#sourceVideo,#prompt').forEach(el=>el.addEventListener('change',viralRefreshWizard));viralRefreshWizard();function pvUpdate(){pvGoToStep(pvStep);viralRefreshWizard()}
+function viralRefreshWizard(){const pet=pvSelected('targetType')==='Pet';const eyebrow=document.querySelector('.viral-type-panel>.pv-eyebrow');if(eyebrow)eyebrow.textContent=pet?'SUBSTITUIR PET':'SUBSTITUIR PESSOA';document.querySelectorAll('.viral-type-grid .pv-option').forEach(x=>x.classList.toggle('selected',!!x.querySelector('input:checked')));const put=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};put('viralSummaryType',pet?'Pet':'Pessoa');put('viralSummaryVideo',document.getElementById('sourceVideo')?.files?.[0]?.name||'Falta escolher');const n=pvSelected('replaceCount')||'1';put('viralSummaryCount',n+' '+(pet?'pet':Number(n)===1?'pessoa':'pessoas'));put('viralSummaryCharacter',document.getElementById('viralReplaceWho')?.value?.trim()||pvSelectedAll('character').join(', ')||'Falta escolher');put('viralSummaryOutfit',pvSelected('outfitMode')||'Roupa original');put('viralSummaryDetails',document.getElementById('prompt')?.value?.trim()||'Nenhum')};document.querySelectorAll('input[name="targetType"],input[name="replaceCount"],input[name="character"],input[name="outfitMode"],#sourceVideo,#prompt').forEach(el=>el.addEventListener('change',viralRefreshWizard));viralRefreshWizard();function pvUpdate(){pvGoToStep(pvStep);viralRefreshWizard()}
 function pvReview(){
  const value=id=>document.getElementById(id)?.value?.trim()||'';
  const file=id=>document.getElementById(id)?.files?.[0]?.name||'Não selecionado';
@@ -698,6 +716,10 @@ $('#pvNext').addEventListener('click',()=>pvGoToStep(pvStep+1));
 $('#viralTypeContinue')?.addEventListener('click',()=>pvGoToStep(1));
 $('#viralVideoBack')?.addEventListener('click',()=>pvGoToStep(0));
 $('#viralVideoNext')?.addEventListener('click',()=>pvGoToStep(2));
+$('#viralReplaceBack')?.addEventListener('click',()=>pvGoToStep(1));
+$('#viralReplaceNext')?.addEventListener('click',()=>{if(!$('#viralReplaceWho').value.trim()){ $('#viralReplaceWho').focus();alert('Descreva quem você quer substituir no vídeo.');return;}pvGoToStep(3)});
+$('#viralReplaceWho')?.addEventListener('input',()=>{const el=$('#viralSummaryCharacter');if(el)el.textContent=$('#viralReplaceWho').value.trim()||'Falta escolher'});
+
 $('#viralVideoWatch')?.addEventListener('click',()=>{const v=$('#pvVideoPreview');v?.scrollIntoView({behavior:'smooth',block:'center'});if(v){v.controls=true;v.play().catch(()=>{});}});
 $('#viralVideoSwap')?.addEventListener('click',()=>$('#sourceVideo').click());
 $('#sourceVideo').addEventListener('change',e=>{const f=e.target.files?.[0],panel=$('#viralVideoSelected'),upload=document.querySelector('.viral-video-upload');if(!f){panel.hidden=true;upload.hidden=false;return;}if(f.size>100*1024*1024){alert('O vídeo deve ter até 100 MB.');e.target.value='';panel.hidden=true;upload.hidden=false;return;}panel.hidden=false;upload.hidden=true;$('#viralVideoSelectedName').textContent=f.name;$('#viralVideoSelectedMeta').textContent=(f.size/1048576).toFixed(1).replace('.',',')+' MB';const thumb=$('#viralVideoThumb');thumb.src=$('#pvVideoPreview').src;thumb.onloadedmetadata=()=>{const dur=thumb.duration;if(Number.isFinite(dur)){$('#viralVideoSelectedMeta').textContent=Math.floor(dur/60)+':'+String(Math.floor(dur%60)).padStart(2,'0')+' · '+(f.size/1048576).toFixed(1).replace('.',',')+' MB';if(dur>60){alert('O vídeo deve ter até 60 segundos.');e.target.value='';panel.hidden=true;upload.hidden=false;}}};});
