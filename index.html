@@ -312,6 +312,43 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 #tab-create #viralReplaceBack{background:transparent;border:1px solid #35383e;color:white}
 #tab-create #viralReplaceNext{background:#c7ff00;border:0;color:#111;box-shadow:0 4px 0 #91bc00}
 @media(max-width:650px){#tab-create .viral-count-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}#tab-create .viral-replace-panel{padding:17px!important}}
+
+#tab-create .viral-character-panel{background:#181a1d!important;border:1px solid #303237!important;border-radius:23px!important;padding:24px!important}
+#tab-create .viral-character-panel>h2{font:900 clamp(23px,2.6vw,35px) Arial,sans-serif!important;color:white!important;margin:0 0 7px!important}
+#tab-create .viral-character-panel>.studio-help{color:#a2a4ae!important;margin-bottom:20px!important}
+#tab-create .viral-character-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:17px}
+#tab-create .viral-character-mode{text-align:left;display:flex;flex-direction:column;background:#1e2125;border:2px solid #31343a;border-radius:22px;padding:0 0 18px;overflow:hidden;color:white;cursor:pointer;min-width:0}
+#tab-create .viral-character-mode.selected{border-color:#c7ff00;box-shadow:0 0 0 4px #b7e90020}
+#tab-create .viral-mode-art{height:140px;width:100%;display:grid;place-items:center;background:radial-gradient(circle,#444b28,#111317);font-size:70px;color:#c7ff00;margin-bottom:13px}
+#tab-create .viral-character-mode>strong{font-size:20px;font-weight:950;padding:0 15px}
+#tab-create .viral-character-mode>span{color:#a5a6ad;padding:5px 15px;flex:1;font-size:14px}
+#tab-create .viral-character-mode>b{background:#c7ff00;color:#111;margin:14px 15px 0;padding:10px;border-radius:10px;font-size:12px;align-self:flex-start}
+#tab-create .viral-catalog-search input{background:#17191c;border:1px solid #34383c;border-radius:14px;padding:14px;color:white;max-width:440px;width:100%;box-sizing:border-box}
+#tab-create .viral-catalog-filters,#tab-create .viral-avatar-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0 20px}
+#tab-create .viral-catalog-filters button,#tab-create .viral-avatar-tabs button{border:1px solid #34383c;border-radius:25px;background:#191b1e;color:#bbb;padding:10px 14px;cursor:pointer}
+#tab-create .viral-catalog-filters button.selected,#tab-create .viral-avatar-tabs button.selected{background:#c7ff00;color:#111}
+#tab-create .viral-catalog-layout{display:grid;grid-template-columns:minmax(0,1fr) 32%;gap:18px}
+#tab-create #pvReadyCharacters{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important}
+#tab-create .viral-catalog-character{position:relative;min-width:0;overflow:hidden;background:#22262a;border:2px solid #32373b;border-radius:17px;cursor:pointer;display:flex;flex-direction:column}
+#tab-create .viral-catalog-character:has(input:checked){border-color:#c7ff00}
+#tab-create .viral-catalog-character img{width:100%!important;height:190px!important;object-fit:cover!important}
+#tab-create .viral-catalog-character strong{font-size:14px!important;color:white;text-transform:uppercase;padding:8px}
+#tab-create .viral-catalog-character small{display:none}
+#tab-create .viral-character-detail{border:1px solid #657500;border-radius:20px;padding:13px;align-self:start;position:sticky;top:10px;background:#101215}
+#tab-create #viralCharacterDetailImg{height:290px;display:grid;place-items:center;font-size:60px;color:#c7ff00;overflow:hidden}
+#tab-create #viralCharacterDetailImg img{width:100%;height:100%;object-fit:cover}
+#tab-create .viral-character-detail h3{color:white;font-size:23px}
+#tab-create .viral-character-detail button,#tab-create #viralAvatarUse,#tab-create #viralCharacterNext{background:#c7ff00;color:#111;border:0;border-radius:12px;padding:15px;font-weight:900;cursor:pointer}
+#tab-create .viral-avatar-layout{display:grid;grid-template-columns:1fr 220px;gap:14px}
+#tab-create .viral-avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+#tab-create .viral-avatar-grid button{min-height:90px;background:#131518;color:#aaa;border:1px solid #30343a;border-radius:12px;cursor:pointer}
+#tab-create .viral-avatar-grid button.selected{border-color:#c7ff00}
+#tab-create .viral-avatar-grid button span{display:block;font-size:34px}
+#tab-create .viral-avatar-preview{background:#202328;padding:12px;border-radius:16px}
+#tab-create #viralAvatarPreview{height:180px;background:#0b0d0e;display:grid;place-items:center;color:#888;font-size:12px}
+#tab-create .viral-character-nav{display:flex;justify-content:space-between;margin-top:24px}
+#tab-create #viralCharacterBack{border:1px solid #373a40;background:transparent;color:white;border-radius:12px;padding:15px 24px;cursor:pointer}
+@media(max-width:750px){#tab-create .viral-character-options{grid-template-columns:1fr}#tab-create .viral-catalog-layout,#tab-create .viral-avatar-layout{grid-template-columns:1fr}#tab-create .viral-avatar-grid{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
@@ -691,6 +728,8 @@ $('#pvNext').addEventListener('click',()=>pvGoToStep(pvStep+1));
 $('#viralTypeContinue')?.addEventListener('click',()=>pvGoToStep(1));
 $('#viralVideoBack')?.addEventListener('click',()=>pvGoToStep(0));
 $('#viralVideoNext')?.addEventListener('click',()=>pvGoToStep(2));
+
+(function(){let mode='ready',tab='Cabelo',selected=null;const $v=id=>document.getElementById(id);function choose(m){mode=m;document.querySelectorAll('[data-viral-mode]').forEach(b=>b.classList.toggle('selected',b.dataset.viralMode===m));$v('viralCharacterReady').hidden=m!=='ready';$v('viralAvatarBuilder').hidden=m!=='avatar';$v('pvPhotoUpload').classList.toggle('hidden',m!=='photo');}document.querySelectorAll('[data-viral-mode]').forEach(b=>b.addEventListener('click',()=>choose(b.dataset.viralMode)));function filter(){const q=$v('viralCharacterSearch').value.toLowerCase(),category=document.querySelector('[data-filter].selected')?.dataset.filter||'Todos';document.querySelectorAll('.viral-catalog-character').forEach(c=>{let name=c.querySelector('strong')?.textContent||'';c.style.display=(name.toLowerCase().includes(q)&&(category==='Todos'||c.dataset.category===category))?'':'none';});}document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-filter]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');filter();}));$v('viralCharacterSearch').addEventListener('input',filter);document.querySelectorAll('.viral-catalog-character').forEach(c=>c.addEventListener('click',()=>{document.querySelectorAll('.viral-catalog-character input').forEach(x=>{if(!c.contains(x))x.checked=false});selected=c.querySelector('strong').textContent;$v('viralCharacterDetailName').textContent=selected;$v('viralCharacterDetailCategory').textContent=c.querySelector('small')?.textContent||'PERSONAGEM';$v('viralCharacterDetailImg').innerHTML=c.querySelector('img')?.outerHTML||'✦';}));$v('viralCharacterUse').addEventListener('click',()=>{if(selected)pvGoToStep(4);else alert('Escolha um personagem primeiro.');});function parts(){let count={Cabelo:16,Rosto:9,Corpo:9,Barba:5}[tab];$v('viralAvatarParts').innerHTML=Array.from({length:count},(_,i)=>'<button type="button" data-part="'+i+'"><span>✦</span><small>'+tab+' '+(i+1)+'</small></button>').join('');$v('viralAvatarParts').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{b.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');$v('viralAvatarPreview').textContent=tab+' · Opção '+(Number(b.dataset.part)+1);}));}document.querySelectorAll('[data-avatar-tab]').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.avatarTab;document.querySelectorAll('[data-avatar-tab]').forEach(x=>x.classList.toggle('selected',x===b));parts();}));parts();$v('viralAvatarUse').addEventListener('click',()=>{selected='Meu avatar';pvGoToStep(4);});$v('viralCharacterBack').addEventListener('click',()=>pvGoToStep(2));$v('viralCharacterNext').addEventListener('click',()=>{if(mode==='photo'&&!$v('customCharacter').files.length){alert('Escolha uma foto.');return;}if(mode==='ready'&&!document.querySelector('.viral-catalog-character input:checked')){alert('Escolha um personagem.');return;}pvGoToStep(4);});})();
 $('#viralReplaceBack')?.addEventListener('click',()=>pvGoToStep(1));
 $('#viralReplaceNext')?.addEventListener('click',()=>{if(!$('#viralReplaceWho').value.trim()){ $('#viralReplaceWho').focus();alert('Descreva quem você quer substituir no vídeo.');return;}pvGoToStep(3)});
 $('#viralReplaceWho')?.addEventListener('input',()=>{const el=$('#viralSummaryCharacter');if(el)el.textContent=$('#viralReplaceWho').value.trim()||'Falta escolher'});
