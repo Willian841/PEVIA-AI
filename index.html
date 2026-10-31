@@ -1304,4 +1304,24 @@ document.getElementById('vgHide')?.addEventListener('click',()=>{document.getEle
 #dashboard.active #tab-create:not(.hidden) > .pv-wizard-layout{display:none!important;visibility:hidden!important;pointer-events:none!important}
 #dashboard.active #tab-create.hidden > #pvAccessPlans{display:none!important}
 </style>
-</body></html>
+<style id="viral-plans-scroll-buttons-fix">
+/* Permite percorrer toda a oferta, inclusive os rodapés dos três cartões. */
+#dashboard.active #tab-create:not(.hidden)>#pvAccessPlans{
+ overflow-x:hidden!important;overflow-y:auto!important;
+ height:100vh!important;height:100dvh!important;
+ overscroll-behavior:contain!important;
+ padding:24px 18px 100px!important;
+ box-sizing:border-box!important;
+ scrollbar-width:thin!important;
+}
+#tab-create #pvAccessPlans .pv-access-grid{align-items:stretch!important;max-width:1180px!important;margin:0 auto!important}
+#tab-create #pvAccessPlans .pv-access-card{display:flex!important;flex-direction:column!important;min-width:0!important;padding:22px 20px!important}
+#tab-create #pvAccessPlans .pv-access-card ul{flex:1!important}
+#tab-create #pvAccessPlans .pv-access-cta{display:block!important;width:auto!important;max-width:260px!important;min-width:0!important;min-height:40px!important;padding:10px 15px!important;margin:15px auto 4px!important;font-size:13px!important;line-height:1.25!important;border-radius:10px!important;white-space:normal!important}
+#tab-create #pvAccessPlans .pv-access-card h3{font-size:23px!important}
+#tab-create #pvAccessPlans .viral-offer-price strong{font-size:clamp(30px,3vw,43px)!important}
+#tab-create #pvAccessPlans .viral-offer-price del{font-size:17px!important}
+#tab-create #pvAccessPlans .viral-insta-proof{padding-bottom:80px!important}
+@media(max-width:1000px){#tab-create #pvAccessPlans .pv-access-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:650px){#tab-create #pvAccessPlans .pv-access-grid{grid-template-columns:1fr!important;max-width:440px!important}#tab-create #pvAccessPlans .pv-access-card{padding:20px 16px!important}#dashboard.active #tab-create:not(.hidden)>#pvAccessPlans{padding:16px 12px 95px!important}}
+</style></body></html>
