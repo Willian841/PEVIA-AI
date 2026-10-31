@@ -1447,4 +1447,18 @@ async function load(){const sb=window.viralMediaSupabase;if(!sb)return;const {da
 setTimeout(load,1200);dash.addEventListener('click',()=>{if(!admin.classList.contains('hidden'))sync()});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()
-})();</script></body></html>
+})();</script><style id="viral-admin-clean-20261031">
+#tab-admin{max-width:1150px!important;margin:0 auto!important;padding:30px 24px 90px!important}
+#tab-admin>.panel:first-child{background:#171b20!important;border:1px solid #343d3e!important;border-radius:20px!important;padding:28px!important;box-shadow:none!important}
+#tab-admin #adminSalesSummary{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important;margin:24px 0!important}
+#tab-admin #adminSalesSummary .stat{min-width:0!important;background:#101419!important;border:1px solid #343b40!important;border-radius:13px!important;padding:19px!important}
+#tab-admin #adminSalesSummary .stat strong{font-size:clamp(21px,2.5vw,30px)!important;color:#c7ff00!important}
+#tab-admin #adminPaymentsList{max-height:490px;overflow-y:auto;scrollbar-width:thin;border-top:1px solid #394039;margin-top:16px;padding-top:16px}
+#tab-admin #viralPaymentsDisclosure{margin-top:22px;border:1px solid #394039;border-radius:14px;padding:16px;background:#11151a}
+#tab-admin #viralPaymentsDisclosure summary{cursor:pointer;font-size:16px;font-weight:800;color:#f1f5f1}
+#tab-admin #viralAdminSettings{border:1px solid #394039;border-radius:16px;padding:22px;margin-top:18px;background:#171b20}
+#tab-admin #viralAdminSettings h2{margin:0 0 12px}
+@media(max-width:900px){#tab-admin #adminSalesSummary{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){#tab-admin{padding:16px 10px!important}#tab-admin #adminSalesSummary{grid-template-columns:1fr!important}}
+</style>
+<script id="viral-admin-clean-js">(function(){function init(){const admin=document.getElementById('tab-admin'),list=document.getElementById('adminPaymentsList'),test=document.getElementById('aiConnectionTest');if(!admin||!list)return;const details=document.createElement('details');details.id='viralPaymentsDisclosure';const summary=document.createElement('summary');summary.textContent='Histórico de pagamentos — clique para visualizar';details.appendChild(summary);list.parentElement.insertBefore(details,list);details.appendChild(list);const settings=document.createElement('section');settings.id='viralAdminSettings';settings.innerHTML='<h2>Configurações e integrações</h2><p class="muted">Gerencie as conexões técnicas do ViralIA.</p>';const panel=test?.closest('.panel');if(panel){panel.parentElement.insertBefore(settings,panel);settings.appendChild(panel)}const header=admin.querySelector('.panel:first-child h2');if(header)header.textContent='Visão geral do negócio';}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()})();</script></body></html>
