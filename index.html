@@ -478,14 +478,19 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 <div class="pv-jersey-preview"><span class="pv-eyebrow">PRÉVIA DA PERSONALIZAÇÃO</span><strong id="jerseyPreviewName">SEU NOME</strong><b id="jerseyPreviewNumber">10</b><small id="jerseyPreviewTeam">Escolha um uniforme</small></div></div>
 <div class="pv-catalog-heading">BÁSICAS</div><div class="pv-clothes-grid"><label class="pv-clothes"><input type="radio" name="clothingStyle" value="Terno"><img src="https://pngimg.com/uploads/suit/suit_PNG93210.png"  alt="Terno"><strong>Terno</strong></label><label class="pv-clothes"><input type="radio" name="clothingStyle" value="Biquíni"><img src="" data-basic-clothing="Biquíni"  alt="Biquíni"><strong>Biquíni</strong></label><label class="pv-clothes"><input type="radio" name="clothingStyle" value="Camiseta branca"><img src="https://pngimg.com/uploads/tshirt/tshirt_PNG5435.png"  alt="Camiseta branca"><strong>Camiseta branca</strong></label><label class="pv-clothes"><input type="radio" name="clothingStyle" value="Vestido preto"><img src="https://pngimg.com/uploads/dress/dress_PNG142.png"  alt="Vestido preto"><strong>Vestido preto</strong></label></div><div id="pvOutfitUpload" class="hidden"><label class="pv-upload-large" for="customClothing"><span>↑</span><strong>Enviar imagem da roupa</strong><small>JPG, PNG ou WebP</small><input id="customClothing" type="file" accept="image/png,image/jpeg,image/webp"></label><div id="clothingFileName" class="upload-name">Nenhuma imagem selecionada</div></div>
 
-</div><div class="pv-wizard-panel" data-step="5">
-    <span class="pv-eyebrow">ETAPA 06 · DETALHES</span><h2>Configure os detalhes finais</h2><p class="studio-help">Personalize os acessórios, os elementos que devem permanecer e as instruções específicas da transformação.</p>
-    <section class="pv-config-section"><div class="pv-config-heading"><span>01</span><div><h3>Acessórios e acabamentos</h3><p>Selecione tudo o que deseja adicionar ao personagem.</p></div></div>
-    <div class="pv-detail-grid"><label class="pv-detail"><input type="checkbox" name="detail" value="Boné"><span>＋</span><strong>Boné</strong></label><label class="pv-detail"><input type="checkbox" name="detail" value="Óculos"><span>＋</span><strong>Óculos</strong></label><label class="pv-detail"><input type="checkbox" name="detail" value="Cordão"><span>＋</span><strong>Cordão</strong></label><label class="pv-detail"><input type="checkbox" name="detail" value="Relógio"><span>＋</span><strong>Relógio</strong></label><label class="pv-detail"><input type="checkbox" name="detail" value="Nome na camisa"><span>＋</span><strong>Nome na camisa</strong></label><label class="pv-detail"><input type="checkbox" name="detail" value="Número na camisa"><span>＋</span><strong>Número na camisa</strong></label></div></section>
-    <section class="pv-config-section"><div class="pv-config-heading"><span>02</span><div><h3>Instruções de aparência</h3><p>Explique o que deve ser mantido ou alterado no resultado.</p></div></div>
-    <div class="field"><label for="detailText">Orientações adicionais</label><textarea id="detailText" placeholder="Ex.: manter o rosto e o cabelo, adicionar um cordão prateado, preservar as cores da roupa..."></textarea></div></section>
-   </div>
-   <div class="pv-wizard-panel" data-step="6">
+</div><div class="pv-wizard-panel viral-details-panel" data-step="5">
+<h2>QUER ADICIONAR ALGUM DETALHE?</h2><p class="studio-help">Opcional. Toque nos itens que quiser ou pule esta etapa.</p>
+<div class="viral-detail-chips">
+<label><input type="checkbox" name="detail" value="Boné"><span>+ Boné</span></label>
+<label><input type="checkbox" name="detail" value="Óculos"><span>+ Óculos</span></label>
+<label><input type="checkbox" name="detail" value="Cordão"><span>+ Cordão</span></label>
+<label><input type="checkbox" name="detail" value="Relógio"><span>+ Relógio</span></label>
+<label><input type="checkbox" name="detail" value="Nome na camisa"><span>+ Nome na camisa</span></label>
+<label><input type="checkbox" name="detail" value="Número na camisa"><span>+ Número na camisa</span></label>
+</div>
+<div class="field"><label for="detailText">Algum detalhe extra?</label><textarea id="detailText" maxlength="300" rows="4" placeholder="Ex.: manter o rosto e o cabelo, adicionar um cordão prateado."></textarea><small id="viralDetailCounter">0/300</small></div>
+</div>
+<div class="pv-wizard-panel" data-step="6">
     <span class="pv-eyebrow">ETAPA 07 · REVISÃO</span><h2>Resumo da sua criação</h2><p class="studio-help">Confira cada configuração. Use “Editar” para voltar diretamente à etapa correspondente.</p>
     <div class="pv-review-summary"><span>✦</span><div><strong>Seu projeto está quase pronto</strong><p>Revise os arquivos, personagem, visual e acabamento antes de salvar.</p></div></div>
     <div class="pv-review-list" id="pvReviewList"></div>
@@ -1231,4 +1236,16 @@ function setup(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
 })();
-</script></body></html>
+</script><style id="viral-details-restore-exact">
+#tab-create .pv-wizard-panel[data-step="5"].active{display:block!important;visibility:visible!important;opacity:1!important;background:#17191c!important;border:1px solid #2c2e33!important;border-radius:22px!important;padding:25px!important;min-height:300px!important}
+#tab-create .pv-wizard-panel[data-step="5"].active h2{display:block!important;color:#fff!important;font-size:clamp(23px,2.5vw,36px)!important;font-weight:900!important;line-height:1.2!important;margin:0 0 8px!important}
+#tab-create .pv-wizard-panel[data-step="5"].active .studio-help{display:block!important;color:#a0a0a8!important;margin:0 0 22px!important}
+#tab-create .pv-wizard-panel[data-step="5"] .viral-detail-chips{display:flex!important;flex-wrap:wrap!important;gap:10px!important;margin-bottom:18px!important}
+#tab-create .pv-wizard-panel[data-step="5"] .viral-detail-chips label{display:inline-flex!important;position:relative!important;cursor:pointer!important}
+#tab-create .pv-wizard-panel[data-step="5"] .viral-detail-chips input{position:absolute!important;opacity:0!important;inset:0!important;cursor:pointer!important}
+#tab-create .pv-wizard-panel[data-step="5"] .viral-detail-chips span{border:1px solid #3b3d43!important;border-radius:25px!important;padding:11px 16px!important;color:#aaaab2!important;font-weight:700!important}
+#tab-create .pv-wizard-panel[data-step="5"] .viral-detail-chips input:checked+span{border-color:#c6ff00!important;color:#c6ff00!important;background:#2b3419!important}
+#tab-create .pv-wizard-panel[data-step="5"] .field{display:block!important}
+#tab-create .pv-wizard-panel[data-step="5"] textarea{display:block!important;width:100%!important;min-height:105px!important;background:#202226!important;color:white!important;border:1px solid #3c3f46!important;border-radius:14px!important;padding:14px!important}
+#tab-create .pv-wizard-panel[data-step="5"] #viralDetailCounter{display:block!important;text-align:right!important;color:#999!important;margin-top:5px!important}
+</style><script id="viral-details-counter">(function(){function start(){const t=document.getElementById('detailText'),c=document.getElementById('viralDetailCounter');if(t&&c){const update=()=>c.textContent=t.value.length+'/300';t.addEventListener('input',update);update()}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start()})();</script></body></html>
