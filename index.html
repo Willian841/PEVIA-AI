@@ -278,6 +278,18 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 #tab-create #viralVideoBack{background:transparent;color:white;border:1px solid #35383e}
 #tab-create #viralVideoNext{background:#c7ff00;color:#111;border:0;box-shadow:0 4px 0 #91bc00}
 @media(max-width:650px){#tab-create .viral-video-panel{padding:17px}#tab-create .viral-video-panel h2{font-size:26px}#tab-create .viral-video-plus{width:56px}}
+
+#tab-create .viral-video-selected[hidden],#tab-create .viral-video-upload[hidden]{display:none!important}
+#tab-create .viral-video-selected-card{display:flex;align-items:center;gap:17px;padding:15px;border:1px solid #a1c600;border-radius:19px;background:#2b3516;min-height:168px}
+#tab-create .viral-video-selected-card video{width:95px;height:136px;flex-shrink:0;border-radius:15px;object-fit:cover;background:#20241d}
+#tab-create .viral-video-selected-info{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+#tab-create .viral-video-selected-info small,#tab-create .viral-video-selected-info span{color:#a9acb3;font-size:14px}
+#tab-create .viral-video-selected-info strong{font-size:17px;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#tab-create .viral-video-selected-actions{display:flex;gap:9px;flex-wrap:wrap}
+#tab-create .viral-video-selected-actions button{background:transparent;border:1px solid #535b42;color:white;padding:12px 14px;border-radius:13px;font-weight:750;cursor:pointer}
+#tab-create .viral-video-selected-actions button:hover{border-color:#c7ff00}
+#tab-create .pv-preview-screen video:not(.hidden){width:100%!important;height:100%!important;object-fit:contain!important;border-radius:17px}
+@media(max-width:750px){#tab-create .viral-video-selected-card{flex-wrap:wrap}#tab-create .viral-video-selected-actions{width:100%}}
 </style>
 </head>
 <body>
@@ -349,7 +361,7 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
    <div class="pv-wizard-panel active viral-type-panel" data-step="0"><span class="pv-eyebrow">SUBSTITUIR PESSOA</span><h2>QUEM VOCÊ QUER SUBSTITUIR?</h2><p class="studio-help">Escolha o que aparece no seu vídeo. Isso define as próximas opções.</p><div class="pv-option-grid viral-type-grid"><label class="pv-option selected"><input type="radio" name="targetType" value="Pessoa" checked><span class="viral-type-image viral-type-person"></span><span class="viral-type-check">✓</span><span class="viral-type-copy"><strong>SUBSTITUIR PESSOA</strong><small>Troque quem aparece no vídeo por outra pessoa ou personagem.</small></span></label><label class="pv-option"><input type="radio" name="targetType" value="Pet"><span class="viral-type-image viral-type-pet"></span><span class="viral-type-check">✓</span><span class="viral-type-copy"><strong>SUBSTITUIR PET</strong><small>Transforme o pet que aparece no vídeo.</small></span></label></div><div class="viral-type-continue-row"><button type="button" class="viral-type-continue" id="viralTypeContinue">Continuar →</button></div><div class="viral-type-hidden-fields" style="display:none"><input id="projectName" maxlength="70" value="Meu vídeo ViralIA"><textarea id="prompt" maxlength="1500"></textarea><input id="replaceReference" type="file" accept="image/*,video/*"><span id="replaceReferenceName"></span></div></div>
 <div class="pv-wizard-panel viral-video-panel" data-step="1">
 <h2>ESCOLHA UM VÍDEO</h2><p class="studio-help">Envie um vídeo da sua galeria ou escolha um da biblioteca.</p>
-<div class="viral-video-upload"><h3>ESCOLHA UM VÍDEO DA SUA GALERIA</h3><p>MP4, MOV ou WEBM · até 100 MB · até 60 segundos</p>
+<div class="viral-video-selected" id="viralVideoSelected" hidden><div class="viral-video-selected-card"><video id="viralVideoThumb" muted playsinline preload="metadata"></video><div class="viral-video-selected-info"><small>Vídeo da sua galeria</small><strong id="viralVideoSelectedName"></strong><span id="viralVideoSelectedMeta"></span></div><div class="viral-video-selected-actions"><button type="button" id="viralVideoWatch">▷ Assistir</button><button type="button" id="viralVideoSwap">Trocar vídeo</button></div></div></div><div class="viral-video-upload"><h3>ESCOLHA UM VÍDEO DA SUA GALERIA</h3><p>MP4, MOV ou WEBM · até 100 MB · até 60 segundos</p>
 <label for="sourceVideo" class="viral-video-drop"><span class="viral-video-plus">+</span><span><strong>Vídeo de referência</strong><small>MP4 ou MOV · arraste ou clique</small></span><input id="sourceVideo" type="file" accept="video/mp4,video/webm,video/quicktime"></label>
 <div class="pv-video-actions"><span id="videoFileName" class="upload-name">Nenhum vídeo selecionado</span><button class="btn" type="button" id="pvReplaceVideo">Trocar vídeo</button></div></div>
 <p class="viral-video-tip">Dica: escolha um vídeo com a pessoa bem visível e com boa luz. Não tem? <a href="https://www.instagram.com/reels/" target="_blank" rel="noopener noreferrer">Veja Reels no Instagram</a>.</p>
@@ -686,6 +698,10 @@ $('#pvNext').addEventListener('click',()=>pvGoToStep(pvStep+1));
 $('#viralTypeContinue')?.addEventListener('click',()=>pvGoToStep(1));
 $('#viralVideoBack')?.addEventListener('click',()=>pvGoToStep(0));
 $('#viralVideoNext')?.addEventListener('click',()=>pvGoToStep(2));
+$('#viralVideoWatch')?.addEventListener('click',()=>{const v=$('#pvVideoPreview');v?.scrollIntoView({behavior:'smooth',block:'center'});if(v){v.controls=true;v.play().catch(()=>{});}});
+$('#viralVideoSwap')?.addEventListener('click',()=>$('#sourceVideo').click());
+$('#sourceVideo').addEventListener('change',e=>{const f=e.target.files?.[0],panel=$('#viralVideoSelected'),upload=document.querySelector('.viral-video-upload');if(!f){panel.hidden=true;upload.hidden=false;return;}if(f.size>100*1024*1024){alert('O vídeo deve ter até 100 MB.');e.target.value='';panel.hidden=true;upload.hidden=false;return;}panel.hidden=false;upload.hidden=true;$('#viralVideoSelectedName').textContent=f.name;$('#viralVideoSelectedMeta').textContent=(f.size/1048576).toFixed(1).replace('.',',')+' MB';const thumb=$('#viralVideoThumb');thumb.src=$('#pvVideoPreview').src;thumb.onloadedmetadata=()=>{const dur=thumb.duration;if(Number.isFinite(dur)){$('#viralVideoSelectedMeta').textContent=Math.floor(dur/60)+':'+String(Math.floor(dur%60)).padStart(2,'0')+' · '+(f.size/1048576).toFixed(1).replace('.',',')+' MB';if(dur>60){alert('O vídeo deve ter até 60 segundos.');e.target.value='';panel.hidden=true;upload.hidden=false;}}};});
+
 document.querySelectorAll('.pv-step[data-pv-step]').forEach(step=>step.addEventListener('click',()=>pvGoToStep(step.dataset.pvStep)));
 $('#pvBack').addEventListener('click',()=>pvGoToStep(pvStep-1));
 document.querySelectorAll('input[name="targetType"]').forEach(x=>x.addEventListener('change',()=>{document.querySelectorAll('.pv-option').forEach(c=>c.classList.toggle('selected',c.querySelector('input')?.checked))}));
