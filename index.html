@@ -349,6 +349,40 @@ header{height:76px;border-bottom:1px solid #ffffff12;display:flex;align-items:ce
 #tab-create .viral-character-nav{display:flex;justify-content:space-between;margin-top:24px}
 #tab-create #viralCharacterBack{border:1px solid #373a40;background:transparent;color:white;border-radius:12px;padding:15px 24px;cursor:pointer}
 @media(max-width:750px){#tab-create .viral-character-options{grid-template-columns:1fr}#tab-create .viral-catalog-layout,#tab-create .viral-avatar-layout{grid-template-columns:1fr}#tab-create .viral-avatar-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* Ajuste compacto de layout solicitado em 31/10 */
+@media(min-width:901px){
+#tab-create.pv-wizard-page{max-width:none!important;width:100%!important;min-width:0!important}
+#tab-create .pv-wizard-layout{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(290px,350px)!important;gap:16px!important;width:100%!important;align-items:start!important}
+#tab-create .pv-wizard-main{grid-column:1!important;grid-row:1!important;width:auto!important;max-width:none!important;min-width:0!important}
+#tab-create .pv-preview-column{grid-column:2!important;grid-row:1!important;position:sticky!important;top:12px!important;align-self:start!important;width:auto!important;max-width:none!important;display:block!important}
+#tab-create .pv-wizard-card{max-width:none!important;width:100%!important;box-sizing:border-box!important}
+}
+#tab-create .viral-character-panel{padding:18px!important;border-radius:19px!important}
+#tab-create .viral-character-panel>h2{font-size:clamp(21px,2vw,29px)!important;line-height:1.15!important}
+#tab-create .viral-character-options{gap:9px!important;margin-bottom:12px!important}
+#tab-create .viral-character-mode{border-radius:14px!important;padding-bottom:10px!important}
+#tab-create .viral-mode-art{height:78px!important;font-size:34px!important;margin-bottom:8px!important}
+#tab-create .viral-character-mode>strong{font-size:15px!important;line-height:1.15!important;padding:0 10px!important}
+#tab-create .viral-character-mode>span{font-size:12px!important;line-height:1.35!important;padding:4px 10px!important}
+#tab-create .viral-character-mode>b{font-size:11px!important;margin:8px 10px 0!important;padding:8px!important}
+#tab-create .viral-catalog-layout{grid-template-columns:minmax(0,1fr) minmax(170px,32%)!important;gap:10px!important}
+#tab-create #pvReadyCharacters{gap:8px!important}
+#tab-create .viral-catalog-character{border-radius:12px!important}
+#tab-create .viral-catalog-character img{height:125px!important;border-radius:9px!important}
+#tab-create .viral-catalog-character strong{font-size:11px!important;padding:6px!important}
+#tab-create .viral-character-detail{padding:9px!important;border-radius:14px!important;top:12px!important}
+#tab-create #viralCharacterDetailImg{height:190px!important;font-size:36px!important}
+#tab-create .viral-character-detail h3{font-size:17px!important;line-height:1.2!important}
+#tab-create .viral-character-detail button{padding:10px!important;font-size:11px!important;width:100%!important}
+#tab-create .pv-stepper{grid-template-columns:repeat(7,minmax(0,1fr))!important}
+#tab-create .pv-step{min-width:0!important;overflow:hidden!important;padding:8px 3px!important}
+#tab-create .pv-step span{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;max-width:100%!important}
+#tab-create .viral-avatar-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+#tab-create .viral-avatar-grid button{min-height:70px!important}
+#tab-create .viral-avatar-layout{grid-template-columns:minmax(0,1fr) 170px!important}
+@media(max-width:1100px) and (min-width:901px){#tab-create .pv-wizard-layout{grid-template-columns:minmax(0,1fr) 290px!important}#tab-create .viral-character-mode>span{font-size:11px!important}}
+@media(max-width:900px){#tab-create .pv-wizard-layout{display:grid!important;grid-template-columns:minmax(0,1fr)!important}#tab-create .pv-preview-column{grid-row:2!important;position:relative!important}#tab-create .pv-wizard-main{grid-row:1!important}#tab-create .viral-character-options{grid-template-columns:repeat(3,minmax(0,1fr))!important}#tab-create .viral-avatar-layout{grid-template-columns:minmax(0,1fr)!important}}
 </style>
 </head>
 <body>
