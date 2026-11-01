@@ -892,7 +892,7 @@ $('#projectForm').addEventListener('submit',async e=>{
    referenceImageUrl=referenceImg?.getAttribute('src')||'';
    if(!referenceImageUrl)throw new Error('Escolha um personagem que tenha foto na galeria ou envie sua própria foto de referência.');
   }
-  if(useViggle){if(!customCharacterFile)throw new Error('Para testar a Viggle, envie uma foto própria em Substituir.');if(!confirm('Testar geração de até 6 segundos com a Viggle AI? Pode consumir créditos Viggle.'))throw new Error('Geração cancelada.');}else{if(!confirm('Este teste enviará seu vídeo e a foto de referência à WaveSpeedAI. Estimativa para '+billableDuration+'s faturáveis em 720p: US$ '+estimatedCost.toFixed(2)+'. O provedor faz a cobrança real conforme a duração. Deseja continuar?'))throw new Error('Geração cancelada. Nenhum arquivo foi enviado à IA.');}
+  if(useViggle){if(!customCharacterFile&&!referenceImageUrl)throw new Error('Selecione um personagem do catálogo ou envie uma foto.');if(!confirm('Testar geração de até 6 segundos com a Viggle AI? Pode consumir créditos Viggle.'))throw new Error('Geração cancelada.');}else{if(!confirm('Este teste enviará seu vídeo e a foto de referência à WaveSpeedAI. Estimativa para '+billableDuration+'s faturáveis em 720p: US$ '+estimatedCost.toFixed(2)+'. O provedor faz a cobrança real conforme a duração. Deseja continuar?'))throw new Error('Geração cancelada. Nenhum arquivo foi enviado à IA.');}
   const avatarParts=['avatarHair','avatarFace','avatarBody','avatarBeard'].map(n=>pvSelected(n)).filter(Boolean).join(', ');
   const character=characterList.join(', ')||(avatarParts?'Avatar personalizado: '+avatarParts+'; '+($('#avatarDescription')?.value?.trim()||'Sem detalhes adicionais'):($('#avatarDescription')?.value?.trim()?'Avatar personalizado: '+$('#avatarDescription').value.trim():'Personagem não selecionado'));
   const details=[...document.querySelectorAll('input[name="detail"]:checked')].map(x=>x.value);
@@ -966,7 +966,17 @@ $('#projectForm').addEventListener('submit',async e=>{
   const {error:uploadError}=await supabaseClient.storage.from('pevia-user-media').upload(sourcePath,videoFile,{upsert:false,contentType:videoFile.type});
   if(uploadError)throw new Error('Não foi possível enviar o vídeo ao armazenamento privado: '+uploadError.message);
   button.textContent='Iniciando IA...';
-  if(useViggle&&!referencePath)throw new Error('Para testar a Viggle, envie sua própria foto de personagem na etapa Substituir.');
+  if(useViggle&&!referencePath){
+   let imageResponse;
+   try{imageResponse=await fetch(referenceImageUrl,{mode:'cors',credentials:'omit'});}catch{throw new Error('A imagem deste personagem não permite transferência automática. Escolha outro personagem ou envie uma foto.');}
+   if(!imageResponse.ok)throw new Error('Não foi possível carregar a imagem do personagem escolhido.');
+   const imageBlob=await imageResponse.blob();
+   if(!['image/jpeg','image/png','image/webp'].includes(imageBlob.type)||imageBlob.size>15*1024*1024)throw new Error('A imagem do personagem não é compatível com a Viggle.');
+   const ext=imageBlob.type==='image/png'?'png':imageBlob.type==='image/webp'?'webp':'jpg';
+   referencePath=currentUser.id+'/'+projectId+'/character-reference.'+ext;
+   const {error:catalogUploadError}=await supabaseClient.storage.from('pevia-user-media').upload(referencePath,imageBlob,{upsert:false,contentType:imageBlob.type});
+   if(catalogUploadError)throw new Error('Não foi possível preparar a imagem do personagem: '+catalogUploadError.message);
+  }
   
   const generationFunction=useViggle?'pevia-viggle-generate':'pevia-generate-video';
   const {data:startData,error:startError}=await supabaseClient.functions.invoke(generationFunction,{
