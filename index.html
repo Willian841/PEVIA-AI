@@ -892,7 +892,7 @@ $('#projectForm').addEventListener('submit',async e=>{
    referenceImageUrl=referenceImg?.getAttribute('src')||'';
    if(!referenceImageUrl)throw new Error('Escolha um personagem que tenha foto na galeria ou envie sua própria foto de referência.');
   }
-  if(!confirm('Este teste enviará seu vídeo e a foto de referência à WaveSpeedAI. Estimativa para '+billableDuration+'s faturáveis em 720p: US$ '+estimatedCost.toFixed(2)+'. O provedor faz a cobrança real conforme a duração. Deseja continuar?'))throw new Error('Geração cancelada. Nenhum arquivo foi enviado à IA.');
+  if(useViggle){if(!customCharacterFile)throw new Error('Para testar a Viggle, envie uma foto própria em Substituir.');if(!confirm('Testar geração de até 6 segundos com a Viggle AI? Pode consumir créditos Viggle.'))throw new Error('Geração cancelada.');}else{if(!confirm('Este teste enviará seu vídeo e a foto de referência à WaveSpeedAI. Estimativa para '+billableDuration+'s faturáveis em 720p: US$ '+estimatedCost.toFixed(2)+'. O provedor faz a cobrança real conforme a duração. Deseja continuar?'))throw new Error('Geração cancelada. Nenhum arquivo foi enviado à IA.');}
   const avatarParts=['avatarHair','avatarFace','avatarBody','avatarBeard'].map(n=>pvSelected(n)).filter(Boolean).join(', ');
   const character=characterList.join(', ')||(avatarParts?'Avatar personalizado: '+avatarParts+'; '+($('#avatarDescription')?.value?.trim()||'Sem detalhes adicionais'):($('#avatarDescription')?.value?.trim()?'Avatar personalizado: '+$('#avatarDescription').value.trim():'Personagem não selecionado'));
   const details=[...document.querySelectorAll('input[name="detail"]:checked')].map(x=>x.value);
@@ -909,11 +909,13 @@ $('#projectForm').addEventListener('submit',async e=>{
   }
   if(outfit==='Enviar minha roupa'&&!customClothingFile)throw new Error('Envie a imagem da roupa que deseja usar.');
   // Verifica o saldo real antes de criar projeto ou enviar arquivos. Esta consulta não inicia geração nem consome créditos.
+  if(!useViggle){
   const {data:balanceData,error:balanceError}=await supabaseClient.functions.invoke('pevia-wavespeed-balance',{body:{}});
   if(balanceError)throw new Error('Não foi possível verificar o saldo da WaveSpeedAI. Nenhum arquivo foi enviado e nenhuma geração foi iniciada. Tente novamente quando a conexão estiver disponível.');
   if(!balanceData?.connected||!Number.isFinite(Number(balanceData.balance_usd)))throw new Error(balanceData?.error||'Não foi possível confirmar o saldo da WaveSpeedAI. Nenhuma geração foi iniciada.');
   const availableBalance=Number(balanceData.balance_usd);
   if(availableBalance+0.000001<estimatedCost)throw new Error('Saldo insuficiente na WaveSpeedAI. Saldo atual: US$ '+availableBalance.toFixed(2)+'; estimativa necessária: US$ '+estimatedCost.toFixed(2)+'. Nenhum arquivo foi enviado e nenhum crédito foi consumido.');
+  }
   const instructions=$('#detailText')?.value?.trim()||'';
   const general=$('#prompt')?.value?.trim()||'';
   const outfitDescription=outfit==='Manter roupa original'
@@ -936,7 +938,7 @@ $('#projectForm').addEventListener('submit',async e=>{
    'PERSONAGEM: '+character,'MODO DE ROUPA: '+outfit,'ROUPA: '+clothing,
    'ACESSÓRIOS: '+(accessories.join(', ')||'Nenhum'),'DETALHES: '+(details.join(', ')||'Nenhum'),
    'INSTRUÇÕES: '+(instructions||'Nenhuma'),'ORIENTAÇÃO: '+(general||'Nenhuma'),
-   'FORMATO: '+aspect_ratio,'MODELO: Pruna AI P-Video Replace · 720p',
+   'FORMATO: '+aspect_ratio,'MODELO: '+(useViggle?'Viggle AI':'Pruna AI P-Video Replace · 720p'),
    'REFERÊNCIAS: imagem 1 = identidade do personagem; imagem 2 = roupa escolhida (quando aplicável).'
   ].join('\n\n');
   const {data:created,error:createError}=await supabaseClient.from('projects').insert({
@@ -965,7 +967,7 @@ $('#projectForm').addEventListener('submit',async e=>{
   if(uploadError)throw new Error('Não foi possível enviar o vídeo ao armazenamento privado: '+uploadError.message);
   button.textContent='Iniciando IA...';
   if(useViggle&&!referencePath)throw new Error('Para testar a Viggle, envie sua própria foto de personagem na etapa Substituir.');
-  if(useViggle&&!confirm('Enviar vídeo e imagem à Viggle? Esta geração pode consumir créditos.'))throw new Error('Geração Viggle cancelada antes do envio.');
+  
   const generationFunction=useViggle?'pevia-viggle-generate':'pevia-generate-video';
   const {data:startData,error:startError}=await supabaseClient.functions.invoke(generationFunction,{
    body:{action:'start',projectId,sourcePath,referencePath,referenceImageUrl,clothingReferencePath,clothingImageUrl,prompt,durationSeconds:duration,confirmPaidGeneration:useViggle}
@@ -973,7 +975,7 @@ $('#projectForm').addEventListener('submit',async e=>{
   if(startError){
    if(startData?.error)throw new Error(startData.error);
    uncertainSubmission=true;
-   throw new Error('Não foi possível confirmar se a WaveSpeedAI recebeu a tarefa. Para evitar cobrança duplicada, não clique novamente; verifique o histórico da WaveSpeedAI.');
+   throw new Error('Não foi possível confirmar se '+(useViggle?'a Viggle':'a WaveSpeedAI')+' recebeu a tarefa. Não clique novamente; verifique o histórico do provedor.');
   }
   if(!startData?.accepted)throw new Error(startData?.error||'A IA não aceitou o vídeo.');
   uncertainSubmission=true;
