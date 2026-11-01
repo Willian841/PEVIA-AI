@@ -1670,4 +1670,19 @@ file.value='';await refresh();status.textContent='Vídeo publicado! Ele já pode
 refresh();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();</script><style id="viral-checkout-click-fix-css">#pvAccessPlans [data-plan-interest]{position:relative!important;z-index:10!important;pointer-events:auto!important;cursor:pointer!important}#peviaCheckoutModal.open{z-index:2147483000!important;display:flex!important}#accessModal.open{z-index:2147483001!important}</style><script id="viral-checkout-click-fix-js">(function(){
+document.addEventListener('click',async function(event){
+const btn=event.target.closest('[data-plan-interest]');if(!btn)return;
+event.preventDefault();event.stopImmediatePropagation();
+const plan=btn.getAttribute('data-plan-interest');if(plan!=='basic'&&plan!=='premium')return;
+try{
+const sb=window.viralMediaSupabase;if(!sb){alert('O pagamento está carregando. Atualize a página e tente novamente.');return}
+const {data,error}=await sb.auth.getSession();if(error)throw error;
+if(!data?.session){const modal=document.getElementById('accessModal');if(modal){modal.classList.add('open');document.getElementById('viralLoginTab')?.click()}else alert('Entre na sua conta para comprar o plano.');return}
+if(typeof pcShow==='function'){pcShow(plan);return}
+const checkout=document.getElementById('peviaCheckoutModal');if(!checkout)throw Error('Janela de pagamento indisponível.');
+document.getElementById('pcPlanInfo').textContent=plan==='premium'?'Premium — R$ 43,99':'Básico — R$ 19,99';
+checkout.classList.add('open');
+}catch(err){alert('Não foi possível abrir o pagamento: '+(err?.message||'tente novamente'))}
+},true);
 })();</script></body></html>
