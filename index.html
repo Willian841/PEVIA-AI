@@ -854,6 +854,7 @@ document.addEventListener('click',function(e){
  const step=Number(btn.dataset.reviewStep);
  if(Number.isInteger(step)&&step>=0&&step<=6){e.preventDefault();pvGoToStep(step)}
 });
+(function(){const b=document.getElementById('pvGenerate');if(!b)return;const label=document.createElement('label');label.id='viralViggleLiveChoice';label.style.cssText='display:block;margin:12px 0;color:#c7ff00;font-weight:700;font-size:13px';label.innerHTML='<input type="checkbox" id="viralUseViggle" style="margin-right:8px">Usar Viggle AI nesta geração (teste do administrador; pode consumir créditos)';b.before(label);function sync(){label.style.display=typeof isPeviaAdmin!=='undefined'&&isPeviaAdmin?'block':'none'}sync();document.addEventListener('click',sync)})();
 $('#projectForm').addEventListener('submit',async e=>{
  e.preventDefault();
  const reviewProblem=pvValidateReview();
@@ -861,6 +862,7 @@ $('#projectForm').addEventListener('submit',async e=>{
  pvShowReviewError(null);
  if(!currentUser){openModal('login');return}
  const button=$('#pvGenerate');let uncertainSubmission=false,projectId=null;
+ const useViggle=!!(isPeviaAdmin&&document.getElementById('viralUseViggle')?.checked);
  button.disabled=true;button.textContent='Preparando vídeo...';
  try{
   if(!supabaseClient)throw new Error('A conexão com o banco de dados não está disponível.');
@@ -962,8 +964,11 @@ $('#projectForm').addEventListener('submit',async e=>{
   const {error:uploadError}=await supabaseClient.storage.from('pevia-user-media').upload(sourcePath,videoFile,{upsert:false,contentType:videoFile.type});
   if(uploadError)throw new Error('Não foi possível enviar o vídeo ao armazenamento privado: '+uploadError.message);
   button.textContent='Iniciando IA...';
-  const {data:startData,error:startError}=await supabaseClient.functions.invoke('pevia-generate-video',{
-   body:{action:'start',projectId,sourcePath,referencePath,referenceImageUrl,clothingReferencePath,clothingImageUrl,prompt,durationSeconds:duration}
+  if(useViggle&&!referencePath)throw new Error('Para testar a Viggle, envie sua própria foto de personagem na etapa Substituir.');
+  if(useViggle&&!confirm('Enviar vídeo e imagem à Viggle? Esta geração pode consumir créditos.'))throw new Error('Geração Viggle cancelada antes do envio.');
+  const generationFunction=useViggle?'pevia-viggle-generate':'pevia-generate-video';
+  const {data:startData,error:startError}=await supabaseClient.functions.invoke(generationFunction,{
+   body:{action:'start',projectId,sourcePath,referencePath,referenceImageUrl,clothingReferencePath,clothingImageUrl,prompt,durationSeconds:duration,confirmPaidGeneration:useViggle}
   });
   if(startError){
    if(startData?.error)throw new Error(startData.error);
@@ -977,7 +982,7 @@ $('#projectForm').addEventListener('submit',async e=>{
   $('#pvResultMessage').textContent='A IA está editando seu vídeo. Isso pode levar alguns minutos. Não feche esta página.';
   for(let attempt=0;attempt<90;attempt++){
    await new Promise(resolve=>setTimeout(resolve,5000));
-   const {data:statusData,error:statusError}=await supabaseClient.functions.invoke('pevia-generate-video',{body:{action:'status',projectId}});
+   const {data:statusData,error:statusError}=await supabaseClient.functions.invoke(generationFunction,{body:{action:'status',projectId}});
    if(statusError||!statusData){
     button.textContent='Aguardando resultado...';
     continue;
