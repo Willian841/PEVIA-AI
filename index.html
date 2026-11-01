@@ -1614,4 +1614,60 @@ function init(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
-</script></body></html>
+</script><style id="viral-auth-video-css">
+#viralAuthVideoShowcase{margin:12px 0 16px;padding:12px;border:1px solid #536c35;border-radius:14px;background:#151d18;color:#fff;text-align:left}
+#viralAuthVideoShowcase strong{display:block;margin-bottom:8px;color:#c7ff00;font-size:14px}
+#viralAuthVideoShowcase video{display:block;width:100%;max-height:220px;object-fit:contain;background:#050505;border-radius:10px}
+#viralAuthVideoShowcase p{font-size:12px;margin:9px 0 0;color:#cbd6c6}
+#viralAuthVideoAdmin{padding:18px;margin:14px 0;border:1px solid #607e35;border-radius:14px;background:#172019}
+#viralAuthVideoAdmin input{display:block;margin:12px 0;max-width:100%;color:#fff}
+#viralAuthVideoAdmin button{background:#c7ff00;color:#111;border:0;border-radius:9px;padding:11px 17px;font-weight:800;cursor:pointer}
+#viralAuthVideoAdmin button:disabled{opacity:.6;cursor:wait}
+#viralAuthVideoAdminStatus{color:#d3e6c5;font-size:13px}
+</style>
+<script id="viral-auth-video-js">(function(){
+function init(){
+const sb=window.viralMediaSupabase,modal=document.getElementById('accessModal'),form=document.getElementById('authForm'),admin=document.getElementById('adminNav'),panel=document.getElementById('tab-admin');
+if(!sb||!modal||!form||!admin||!panel)return;
+const showcase=document.createElement('section');showcase.id='viralAuthVideoShowcase';showcase.hidden=true;
+const title=document.createElement('strong');title.textContent='▶ Veja o que você pode criar com o ViralIA';
+const video=document.createElement('video');video.controls=true;video.playsInline=true;video.preload='metadata';
+const note=document.createElement('p');note.textContent='Assista ao vídeo de demonstração e descubra as possibilidades da plataforma.';
+showcase.append(title,video,note);form.before(showcase);
+const adminBox=document.createElement('section');adminBox.id='viralAuthVideoAdmin';adminBox.hidden=true;
+const heading=document.createElement('h3');heading.textContent='Vídeo da tela de cadastro e login';
+const description=document.createElement('p');description.textContent='Publique um vídeo MP4 ou WebM para aparecer a todos os visitantes nas telas de criar conta e entrar. O novo vídeo substitui o anterior.';
+const file=document.createElement('input');file.type='file';file.accept='video/mp4,video/webm';
+const button=document.createElement('button');button.type='button';button.textContent='Publicar vídeo';
+const status=document.createElement('p');status.id='viralAuthVideoAdminStatus';status.setAttribute('role','status');
+adminBox.append(heading,description,file,button,status);panel.prepend(adminBox);
+function syncAdmin(){adminBox.hidden=admin.classList.contains('hidden')}
+new MutationObserver(syncAdmin).observe(admin,{attributes:true,attributeFilter:['class']});syncAdmin();
+async function refresh(){
+try{
+const {data,error}=await sb.from('site_media').select('storage_path').eq('placement','auth_promo').eq('is_active',true).order('created_at',{ascending:false}).limit(1);
+if(error)throw error;
+if(data?.length){const url=sb.storage.from('pevia-home').getPublicUrl(data[0].storage_path).data.publicUrl;video.src=url;showcase.hidden=false;status.textContent='Vídeo publicado e disponível para visitantes.'}
+else{showcase.hidden=true;video.removeAttribute('src');video.load();status.textContent='Nenhum vídeo publicado ainda.'}
+}catch(err){status.textContent='Não foi possível carregar o vídeo: '+err.message}
+}
+button.addEventListener('click',async()=>{
+const selected=file.files?.[0];if(!selected){status.textContent='Escolha um vídeo primeiro.';return}
+if(!['video/mp4','video/webm'].includes(selected.type)){status.textContent='Use um arquivo MP4 ou WebM.';return}
+if(selected.size>250*1024*1024){status.textContent='O vídeo deve ter no máximo 250 MB.';return}
+button.disabled=true;status.textContent='Enviando vídeo...';
+try{
+const {data:{user},error:userError}=await sb.auth.getUser();if(userError||!user)throw new Error('Entre na conta de administrador.');
+const {data:profile,error:profileError}=await sb.from('profiles').select('role').eq('id',user.id).single();
+if(profileError||profile?.role!=='admin')throw new Error('Somente o administrador pode publicar.');
+const path='auth-promo/'+user.id+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+(selected.type==='video/webm'?'.webm':'.mp4');
+const {error:uploadError}=await sb.storage.from('pevia-home').upload(path,selected,{contentType:selected.type,upsert:false});if(uploadError)throw uploadError;
+const {error:insertError}=await sb.from('site_media').insert({placement:'auth_promo',title:'Vídeo da tela de cadastro',storage_path:path,is_active:true,created_by:user.id});if(insertError)throw insertError;
+const {error:oldError}=await sb.from('site_media').update({is_active:false}).eq('placement','auth_promo').eq('is_active',true).neq('storage_path',path);if(oldError)throw oldError;
+file.value='';await refresh();status.textContent='Vídeo publicado! Ele já pode aparecer no cadastro e no login.';
+}catch(err){status.textContent='Erro ao publicar: '+err.message}finally{button.disabled=false}
+});
+refresh();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();</script></body></html>
