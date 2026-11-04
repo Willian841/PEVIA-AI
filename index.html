@@ -1743,23 +1743,43 @@ document.addEventListener('visibilitychange',refresh);window.addEventListener('r
 })();</script>
 <style id="viral-first-plan-css">#viralFirstPlan{display:none;position:fixed;inset:0;z-index:2147482000;overflow-y:auto;background:#080910;padding:24px 16px 65px}#viralFirstPlan.open{display:block}#viralFirstPlan .pv-access-heading{text-align:center;margin:12px auto 25px}#viralFirstPlan .pv-access-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;max-width:1080px;margin:auto}#viralFirstPlan .viral-first-back{display:block;margin:0 auto 16px}@media(max-width:800px){#viralFirstPlan .pv-access-grid{grid-template-columns:1fr;max-width:480px}}</style>
 <script id="viral-first-plan-js">(function(){
-function init(){var original=document.querySelector('#pvAccessPlans .pv-access-grid');if(!original)return;var layer=document.createElement('section');layer.id='viralFirstPlan';layer.innerHTML='<div class="pv-access-heading"><h2>Escolha seu plano ViralIA</h2><p>Escolha um plano para começar. Você criará sua conta antes de pagar.</p></div>';var cards=original.cloneNode(true);cards.querySelectorAll('[data-plan-interest]').forEach(function(b){b.setAttribute('data-first-plan',b.getAttribute('data-plan-interest'));b.removeAttribute('data-plan-interest')});layer.appendChild(cards);document.body.appendChild(layer);
-
-document.addEventListener('click',function(e){var b=e.target.closest('#landing [data-open="signup"]');if(!b||b.dataset.firstPlanBypass==='yes')return;e.preventDefault();e.stopImmediatePropagation();layer.classList.add('open')},true);
-layer.addEventListener('click',function(e){var b=e.target.closest('[data-first-plan]');if(!b)return;e.preventDefault();var plan=b.getAttribute('data-first-plan');localStorage.setItem('viralPendingPurchasePlan',plan);layer.classList.remove('open');var signup=document.querySelector('#landing [data-open="signup"]');if(signup){signup.dataset.firstPlanBypass='yes';signup.click();delete signup.dataset.firstPlanBypass}});
-var opening=false;
-async function resumePurchase(){if(opening)return;var sb=window.viralMediaSupabase;if(!sb)return;opening=true;
-try{var result=await sb.auth.getSession();var user=result.data?.session?.user;if(!user)return;
-var dashboard=document.getElementById('dashboard');if(!dashboard||!dashboard.classList.contains('active'))return;
-var {data:active}=await sb.from('payments').select('id').eq('user_id',user.id).eq('status','approved').or('expires_at.gt.'+new Date().toISOString()+',expires_at.is.null').limit(1);
-if(active&&active.length)return;
-var plan=localStorage.getItem('viralPendingPurchasePlan')||user.user_metadata?.selected_plan;
-var marker='viralCheckoutShown_'+user.id;
-if(sessionStorage.getItem(marker))return;
-if(!['basic','premium','lifetime'].includes(plan)){sessionStorage.setItem(marker,'1');var go=document.querySelector('[data-tab="create"]');if(go)go.click();return}
-var button=document.querySelector('#pvAccessPlans [data-plan-interest="'+plan+'"]');if(!button)return;
-sessionStorage.setItem(marker,'1');button.click();setTimeout(function(){var modal=document.getElementById('peviaCheckoutModal');if(!modal?.classList.contains('open'))sessionStorage.removeItem(marker)},1000);
-}catch(e){console.warn('Checkout pendente:',e)}finally{opening=false}}
-setInterval(resumePurchase,1500);setTimeout(resumePurchase,500);window.addEventListener('pageshow',resumePurchase);
-}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()
+function init(){
+ const original=document.querySelector('#pvAccessPlans .pv-access-grid');if(!original)return;
+ const layer=document.createElement('section');layer.id='viralFirstPlan';
+ layer.innerHTML='<div class="pv-access-heading"><h2>Escolha seu plano ViralIA</h2><p>Selecione o plano que deseja pagar com Pix ou cartão.</p></div>';
+ const cards=original.cloneNode(true);
+ cards.querySelectorAll('[data-plan-interest]').forEach(function(b){b.setAttribute('data-first-plan',b.getAttribute('data-plan-interest'));b.removeAttribute('data-plan-interest')});
+ layer.appendChild(cards);document.body.appendChild(layer);
+ layer.addEventListener('click',function(e){
+  const b=e.target.closest('[data-first-plan]');if(!b)return;e.preventDefault();
+  const plan=b.getAttribute('data-first-plan');if(!['basic','premium','lifetime'].includes(plan))return;
+  const paymentButton=document.querySelector('#pvAccessPlans [data-plan-interest="'+plan+'"]');
+  if(!paymentButton)return;
+  localStorage.setItem('viralPendingPurchasePlan',plan);
+  layer.classList.remove('open');
+  const sb=window.viralMediaSupabase;
+  sb?.auth.getSession().then(function(result){
+   if(result.data?.session?.user){sessionStorage.setItem('viralCheckoutShown_'+result.data.session.user.id,'1');paymentButton.click()}
+   else{const signup=document.querySelector('#landing [data-open="signup"]');signup?.click()}
+  });
+ });
+ let opening=false;
+ async function resumePurchase(){
+  if(opening||layer.classList.contains('open'))return;
+  const sb=window.viralMediaSupabase;if(!sb)return;opening=true;
+  try{
+   const result=await sb.auth.getSession();const user=result.data?.session?.user;if(!user)return;
+   const dashboard=document.getElementById('dashboard');if(!dashboard?.classList.contains('active'))return;
+   if(document.getElementById('peviaCheckoutModal')?.classList.contains('open'))return;
+   const {data:active,error}=await sb.from('payments').select('id').eq('user_id',user.id).eq('status','approved').or('expires_at.gt.'+new Date().toISOString()+',expires_at.is.null').limit(1);
+   if(error)return;if(active?.length)return;
+   const marker='viralCheckoutShown_'+user.id;
+   if(sessionStorage.getItem(marker))return;
+   sessionStorage.setItem(marker,'1');
+   layer.classList.add('open');
+  }catch(e){console.warn('Seleção de plano:',e)}finally{opening=false}
+ }
+ setInterval(resumePurchase,1500);setTimeout(resumePurchase,500);window.addEventListener('pageshow',resumePurchase);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();</script><style id="viral-mobile-sidebar-compact-final">@media(max-width:760px){#dashboard .viral-account-sidebar{width:100%!important;min-width:0!important;max-height:160px!important;overflow-y:auto!important;padding:6px 9px!important}#dashboard .viral-side-wallet{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:5px 10px!important;margin:3px 0!important;padding:6px 8px!important;font-size:11px!important}#dashboard .viral-side-wallet>div:first-child,#dashboard .viral-side-wallet>strong,#dashboard .viral-side-wallet>p,#dashboard .viral-side-progress{display:none!important}#dashboard .viral-side-wallet-bottom{margin:0!important;padding:0!important;border:0!important;flex:1 1 auto!important}#dashboard .viral-side-profile{margin:0!important;padding:0!important;flex:1 1 170px!important;min-width:0!important}#dashboard .viral-profile-avatar{width:26px!important;height:26px!important;min-width:26px!important}#dashboard .viral-profile-info small{display:none!important}#dashboard .viral-profile-info strong{font-size:11px!important}#dashboard .viral-profile-exit{width:28px!important;height:28px!important}}@media(max-width:760px){#dashboard .dash-layout{grid-template-columns:minmax(0,1fr)!important}}</style></body></html>
